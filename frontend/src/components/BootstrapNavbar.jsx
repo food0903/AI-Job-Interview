@@ -1,23 +1,13 @@
 import React from 'react';
 import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
-
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase';
-import { signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
-import GoogleButton from 'react-google-button';
-
+import { signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 function BootstrapNavbar() {
   const [user] = useAuthState(auth);
-
-  const handleSignInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error(error.message);
-    }
-  };
+  const navigate = useNavigate(); // Hook for navigation
 
   const handleSignOut = async () => {
     try {
@@ -30,13 +20,11 @@ function BootstrapNavbar() {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="#home">Ai interview with chun chan</Navbar.Brand>
+        <Navbar.Brand href="#home">AI Interview with Chun Chan</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            {!user ? (
-              <GoogleButton onClick={handleSignInWithGoogle}/>
-            ) : (
+            {user && (
               <>
                 <NavDropdown title={`Hello, ${user.displayName}`} id="basic-nav-dropdown">
                   <NavDropdown.Item onClick={handleSignOut}>Sign Out</NavDropdown.Item>
