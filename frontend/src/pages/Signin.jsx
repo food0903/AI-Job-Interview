@@ -3,6 +3,7 @@ import GoogleButton from 'react-google-button';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+<<<<<<< HEAD
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const SignInPage = ({ onSignIn }) => {
@@ -16,6 +17,17 @@ const SignInPage = ({ onSignIn }) => {
       console.log('Google sign-in successful');
       onSignIn(); // Trigger the sign-in callback
       navigate('/'); // Redirect to HomePage
+=======
+
+const SignInPage = () => {
+  const [user, loading, error] = useAuthState(auth); // Authentication state
+
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider(); // Google Auth Provider
+    try {
+      await signInWithPopup(auth, provider); // Google sign-in popup
+      console.log('Google sign-in successful');
+>>>>>>> c7ce7b44d4a180729079eceb9f3108b9a9aa8017
     } catch (error) {
       console.error('Google sign-in failed:', error.message); // Error handling
     }
