@@ -1,7 +1,9 @@
+import NavbarLayout from '../components/NavbarLayout'
+
 export default function Home() {
     return (
-        <div>
-            adsasdasd
-        </div>
+        <NavbarLayout>
+            <p>asdasd</p>
+        </NavbarLayout>
     )
 }
