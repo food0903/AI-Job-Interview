@@ -1,0 +1,75 @@
+/* HomePage.css */
+
+/* Styles for the navy blue banner */
+.navbar {
+    width: 100%;
+    background-color: #1c3d5a; /* Navy blue equivalent */
+    padding: 0.75rem; /* Equivalent to p-3 in Tailwind */
+    text-align: center;
+    color: white;
+  }
+  
+  /* Styles for the logo placeholder */
+  .logo-placeholder {
+    width: 3rem; /* 12 Tailwind unit */
+    height: 3rem;
+    background-color: #d1d5db; /* Light gray */
+    border-radius: 50%; /* Circular shape */
+    margin: 0 auto; /* Centered */
+  }
+  
+  /* Sidebar styles */
+  .sidebar {
+    width: 25%; /* w-1/4 */
+    background-color: #ebf8ff; /* Light blue */
+    padding: 1rem; /* p-4 */
+    overflow-y: auto; /* Enable scrolling */
+  }
+  
+  /* Sidebar text styles */
+  .sidebar h2 {
+    font-size: 1.25rem; /* text-xl */
+    font-weight: bold; /* font-bold */
+    color: #1e3a8a; /* Dark blue */
+  }
+  
+  .sidebar li {
+    margin-top: 0.5rem; /* mt-2 */
+    color: #1e3a8a; /* text-blue-700 */
+  }
+  
+  /* Chat box styles */
+  .chatbox {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .chatbox .content {
+    flex: 1;
+    background-color: white;
+    border: 1px solid #bfdbfe; /* border-blue-200 */
+    padding: 1rem; /* p-4 */
+    overflow-y: auto;
+  }
+  
+  .chatbox .input-section {
+    display: flex;
+    margin-top: 0.5rem; /* mt-2 */
+  }
+  
+  .chatbox input {
+    flex: 1;
+    border: 1px solid #93c5fd; /* border-blue-300 */
+    padding: 0.5rem; /* p-2 */
+    border-radius: 0.25rem; /* rounded */
+  }
+  
+  .chatbox button {
+    margin-left: 0.5rem; /* ml-2 */
+    background-color: #3b82f6; /* bg-blue-500 */
+    color: white;
+    padding: 0.5rem; /* p-2 */
+    border-radius: 0.25rem; /* rounded */
+  }
+  
