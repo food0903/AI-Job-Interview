@@ -3,11 +3,11 @@ import '../css/HomePage.css';
 import Recorder from './Recorder';
 // Sidebar for chat history
 const Sidebar = ({ chatHistory }) => (
-  <div className="sidebar">
-    <h2>Chat History</h2>
+  <div className="w-1/4 bg-[#ebf8ff] p-4 overflow-y-auto">
+    <h2 className="text-xl font-bold">Chat History</h2>
     <ul>
       {chatHistory.map((msg, index) => (
-        <li key={index}>{msg}</li>
+        <li className="text-blue-700" key={index}>{msg}</li> 
       ))}
     </ul>
   </div>
@@ -15,15 +15,17 @@ const Sidebar = ({ chatHistory }) => (
 
 // Main chat box
 const ChatBox = ({ currentMessage, setCurrentMessage, sendMessage }) => (
-  <div className="chatbox">
-    <div className="content">
+  <div className="flex flex-col h-full">
+    <div className="flex-1 bg-white border-blue-200 border-1 p-4 overflow-y-auto">
+      {/* Display area for future messages */}
     </div>
-    <div className="input-section">
+    <div className="flex mt-2">
       <input
         type="text"
         value={currentMessage}
         onChange={(e) => setCurrentMessage(e.target.value)}
         placeholder="Type a message..."
+        className="flex-1 border-1 border-blue-300 p-2 rounded-lg"
       />
     </div>
   </div>
@@ -48,16 +50,16 @@ const HomePage = () => {
 
   return (
     <div className="flex flex-col h-screen bg-blue-50">
-      <div className="navbar"> {/* Navy blue banner */}
-        <div className="logo-placeholder"> {/* Logo placeholder */}
+      <div className="w-full bg-slate-700 p-3 text-center text-white"> 
+        <div className="w-12 h-12 bg-[#d1d5db] rounded-full mx-auto m-0">
           <img src="/src/assets/CompanyLogo.png" alt="Company Logo" className="rounded-full" />
         </div>
       </div>
 
-      <div className="flex flex-row flex-1"> {/* Main content */}
-        <Sidebar chatHistory={chatHistory} /> {/* Sidebar */}
+      <div className="flex flex-row flex-1"> 
+        <Sidebar chatHistory={chatHistory} /> 
 
-        <div className="flex-1 p-4 bg-blue-50"> {/* Main chat box */}
+        <div className="flex-1 p-4 bg-blue-50"> 
           <ChatBox
             currentMessage={currentMessage}
             setCurrentMessage={setCurrentMessage}
