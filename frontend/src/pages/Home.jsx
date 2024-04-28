@@ -10,9 +10,9 @@ export default function Home() {
 
     return (
         <NavbarLayout>
-            {user ? ( // If user exists, render HomePage
+            {user ? ( 
                 <HomePage />
-            ) : ( // Otherwise, render SignInPage
+            ) : ( 
                 <SignInPage />
             )}
         </NavbarLayout>
