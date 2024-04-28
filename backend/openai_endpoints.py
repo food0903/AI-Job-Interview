@@ -1,11 +1,15 @@
 from openai import OpenAI
 from decouple import config
 import random
+from pathlib import Path
+import requests
+
 
 api_key = config("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 client.organization = config("OPEN_AI_ORG")
 client.api_key = config("OPENAI_API_KEY")
+ELEVEN_LABS_API_KEY = config("ELEVEN_LABS_API_KEY")
 
 def response_behavior():
     with open("description.txt", "r") as file:
@@ -55,3 +59,32 @@ def get_response(input_message):
         print(e)
         return
     
+def text_to_speech(message):
+    body = {
+        "text": message,
+        "voice_settings": {
+            "stability": 0,
+            "similarity_boost": 0
+        },
+    }
+
+    voice_shaun = "mTSvIrm2hmcnOvb21nW2"
+    voice_rachel = "21m00Tcm4TlvDq8ikWAM"
+    voice_antoni = "ErXwobaYiN019PkySvjV"
+
+    # Construct request headers and url
+    headers = { "xi-api-key": ELEVEN_LABS_API_KEY, "Content-Type": "application/json"}
+    endpoint = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_rachel}"
+
+    try:
+        response = requests.post(endpoint, json=body, headers=headers)
+
+        if (response.status_code == 200):
+            return response.content  # Valid content
+        else:
+            raise ValueError("Text-to-speech API returned an error")
+    except Exception as e:
+        print("Error in text_to_speech:", e)
+        return None  # Handle exceptions
+
+

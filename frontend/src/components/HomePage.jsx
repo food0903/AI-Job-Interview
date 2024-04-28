@@ -13,7 +13,6 @@ import { signOut } from "firebase/auth";
 import { ReactMediaRecorder } from "react-media-recorder";
 
 function Homepage() {
-
   const [blobURL, setBlobURL] = useState(null);
 
   return (
@@ -31,6 +30,7 @@ function Homepage() {
           defaultValue="Default Value"
           inputProps={{ style: { fontSize: "0.8rem" } }}
         />
+
         <Pagination
           sx={{
             position: "absolute",
@@ -51,7 +51,7 @@ function Homepage() {
             />
           )}
         />
-       
+
         <div>
           <ReactMediaRecorder
             audio
@@ -63,15 +63,16 @@ function Homepage() {
             }) => (
               <div>
                 <p>{status}</p>
-                <button 
-                onClick={status === "recording" ? stopRecording : startRecording} 
-                className="mt-2 border-2 flex justify-center p-1 rounded-full"
-              >
-                <KeyboardVoiceIcon />
-              </button>
-                <div onClick={() => setBlobURL(blobURL)}>
-                  <video src={mediaBlobUrl} controls autoPlay loop />
-                </div>
+                <button
+                  onClick={
+                    status === "recording" ? stopRecording : startRecording
+                  }
+                  className="mt-2 border-2 flex justify-center p-1 rounded-full"
+                >
+                  <KeyboardVoiceIcon />
+                </button>
+
+                <video src={mediaBlobUrl} controls autoPlay loop />
               </div>
             )}
           />
