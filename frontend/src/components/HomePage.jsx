@@ -1,116 +1,85 @@
-import React, { useState } from 'react';
-import '../css/HomePage.css';
-import Recorder from './Recorder';
-import axios from 'axios';
-// Sidebar for chat history
-const HomePage = () => {
+import React, { useState } from "react";
+import {
+  Pagination,
+  PaginationItem,
+  Typography,
+  TextField,
+} from "@mui/material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
+import { ReactMediaRecorder } from "react-media-recorder";
 
-const Sidebar = ({ chatHistory }) => (
-  <div className="w-1/4 bg-[#ebf8ff] p-4 overflow-y-auto">
-    <h2 className="text-xl font-bold">Chat History</h2>
-    <ul>
-      {chatHistory.map((msg, index) => (
-        <li className="text-blue-700" key={index}>{msg}</li> 
-      ))}
-    </ul>
-  </div>
-);
-
-// Main chat box
-const ChatBox = ({ currentMessage, setCurrentMessage, sendMessage }) => (
-  <div className="flex flex-col h-full">
-    <div className="flex-1 bg-white border-blue-200 border-1 p-4 overflow-y-auto">
-      {/* Display area for future messages */}
-    </div>
-    <div className="flex mt-2">
-      <input
-        type="text"
-        value={currentMessage}
-        onChange={(e) => setCurrentMessage(e.target.value)}
-        placeholder="Type a message..."
-        className="flex-1 border-1 border-blue-300 p-2 rounded-lg"
-      />
-    </div>
-  </div>
-);
-
-// Main HomePage component
-  const [chatHistory, setChatHistory] = useState([]);
-  const [currentMessage, setCurrentMessage] = useState(''); // Correct useState initialization
-  const [audioBlob, setAudioBlob] = useState(null);  // Store audio blob
-  const [messages, setMessages] = useState([]); // Store messages
-  const [isLoading, setIsLoading] = useState(false); // Loading state
-
-
-  
-  const saveAudio = (audioBlob) => {
-    setIsLoading(true);
-    const myMessage = { sender: "me", audioBlob };
-    const messageList = [...messages, myMessage];
-
-    fetch(audioBlob)
-  .then((res) => res.blob())
-  .then(async (audioBlob) => {
-    const formData = new FormData();
-    formData.append("file", audioBlob, "audio.wav");
-    await axios.post("http://localhost:8000/post_audio", formData, {headers: {'Content-Type': 'multipart/form-data'}, responseType: 'arraybuffer'})
-    .then((response) => {
-      const blob = response.data;
-    const audio = new Audio();
-  audio.src = createBlobURL(blob);
-  const responseAudio = { sender: "Chun Chan", audioBlob: audio.src};
-  messageList.push(responseAudio);
-  setMessages(messageList);
-  setIsLoading(false);
-  audio.play();
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-  });
-};
-
-  function createBlobURL(data) {
-    const blob = new Blob([data], { type: "audio/mpeg" });
-    const url = window.URL.createObjectURL(blob);
-    return url;
-  }
-  
-  const sendMessage = () => {
-    if (currentMessage.trim() !== '') {
-      setChatHistory([...chatHistory, currentMessage]);
-      setCurrentMessage(''); // Clear input after sending
-    }
-  };
-
+function Homepage() {
+  const [blobURL, setBlobURL] = useState(null);
 
   return (
-    <div className="flex flex-col h-screen bg-blue-50">
-      <div className="w-full bg-slate-700 p-3 text-center text-white"> 
-        <div className="w-12 h-12 bg-[#d1d5db] rounded-full mx-auto m-0">
-          <img src="/src/assets/CompanyLogo.png" alt="Company Logo" className="rounded-full" />
-        </div>
-      </div>
+    <div className="w-full min-h-screen flex items-center justify-center">
+      <div className="w-1/3 h-96 rounded-2xl drop-shadow-lg bg-slate-100 relative p-4">
+        <Typography sx={{ fontWeight: "bold" }}>
+          Question: Tell me about yourself
+        </Typography>
+        <TextField
+          sx={{ width: "100%", mt: 1 }}
+          id="response"
+          label="Response"
+          multiline
+          rows={4}
+          defaultValue="Default Value"
+          inputProps={{ style: { fontSize: "0.8rem" } }}
+        />
 
-      <div className="flex flex-row flex-1"> 
-        <Sidebar chatHistory={chatHistory} /> 
+        <Pagination
+          sx={{
+            position: "absolute",
+            bottom: 3,
+            left: 0,
+            right: 0,
+            display: "flex",
+            justifyContent: "center",
+          }}
+          count={5}
+          renderItem={(item) => (
+            <PaginationItem
+              slots={{
+                previous: ArrowBackIosNewIcon,
+                next: ArrowForwardIosIcon,
+              }}
+              {...item}
+            />
+          )}
+        />
 
-<<<<<<< HEAD
-        <div className="flex-1 p-4 bg-blue-50"> {/* Main chat box */}
-        
-=======
-        <div className="flex-1 p-4 bg-blue-50"> 
->>>>>>> e4018cbcb02748adfbb61e6eefc291e9317905f4
-          <ChatBox
-            currentMessage={currentMessage}
-            setCurrentMessage={setCurrentMessage}
-            sendMessage={sendMessage}
+        <div>
+          <ReactMediaRecorder
+            audio
+            render={({
+              status,
+              startRecording,
+              stopRecording,
+              mediaBlobUrl,
+            }) => (
+              <div>
+                <p>{status}</p>
+                <button
+                  onClick={
+                    status === "recording" ? stopRecording : startRecording
+                  }
+                  className="mt-2 border-2 flex justify-center p-1 rounded-full"
+                >
+                  <KeyboardVoiceIcon />
+                </button>
+
+                <video src={mediaBlobUrl} controls autoPlay loop />
+              </div>
+            )}
           />
-            <Recorder handleStop={saveAudio}/>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default HomePage;
+export default Homepage;

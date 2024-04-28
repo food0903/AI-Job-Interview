@@ -1,7 +1,7 @@
 import React from 'react';
 import NavbarLayout from '../components/NavbarLayout';
 import SignInPage from './Signin'; // Correct capitalization
-import HomePage from '../components/HomePage'; // Correct capitalization
+import Homepage from '../components/Homepage'; // Correct capitalization
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase'; // Ensure this is the correct import
 
@@ -11,7 +11,7 @@ export default function Home() {
     return (
         <NavbarLayout>
             {user ? ( // If user exists, render HomePage
-                <HomePage />
+                <Homepage />
             ) : ( // Otherwise, render SignInPage
                 <SignInPage />
             )}
