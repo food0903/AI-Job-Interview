@@ -26,7 +26,7 @@ const ChatBox = ({ currentMessage, setCurrentMessage, sendMessage }) => (
         onChange={(e) => setCurrentMessage(e.target.value)}
         placeholder="Type a message..."
       />
-      <button>Record</button>
+      <button onClick={sendMessage}>Send</button>
     </div>
   </div>
 );
