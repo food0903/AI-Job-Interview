@@ -3,6 +3,9 @@ import { ReactMediaRecorder } from 'react-media-recorder';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'tailwindcss/tailwind.css';
 
+Props = {
+    handleStop
+};
 function Recorder({ handleStop}) {
 
     return (
