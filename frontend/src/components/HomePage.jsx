@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../css/HomePage.css';
-
+import Recorder from './Recorder';
 // Sidebar for chat history
 const Sidebar = ({ chatHistory }) => (
   <div className="sidebar">
@@ -17,7 +17,6 @@ const Sidebar = ({ chatHistory }) => (
 const ChatBox = ({ currentMessage, setCurrentMessage, sendMessage }) => (
   <div className="chatbox">
     <div className="content">
-      {/* Display area for future messages */}
     </div>
     <div className="input-section">
       <input
@@ -26,7 +25,6 @@ const ChatBox = ({ currentMessage, setCurrentMessage, sendMessage }) => (
         onChange={(e) => setCurrentMessage(e.target.value)}
         placeholder="Type a message..."
       />
-      <button>Record</button>
     </div>
   </div>
 );
@@ -35,7 +33,12 @@ const ChatBox = ({ currentMessage, setCurrentMessage, sendMessage }) => (
 const HomePage = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentMessage, setCurrentMessage] = useState(''); // Correct useState initialization
+  const [audioBlob, setAudioBlob] = useState(null);  // Store audio blob
 
+  const saveAudio = (blob) => {
+    setAudioBlob(blob);
+  };
+  
   const sendMessage = () => {
     if (currentMessage.trim() !== '') {
       setChatHistory([...chatHistory, currentMessage]);
@@ -60,6 +63,7 @@ const HomePage = () => {
             setCurrentMessage={setCurrentMessage}
             sendMessage={sendMessage}
           />
+            <Recorder handleStop={saveAudio}/>
         </div>
       </div>
     </div>
