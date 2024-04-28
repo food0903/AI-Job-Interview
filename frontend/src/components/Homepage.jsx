@@ -11,9 +11,48 @@ import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { ReactMediaRecorder } from "react-media-recorder";
+import Recorder from "./Recorder";
+import axios from "axios";
 
 function Homepage() {
-  const [blobURL, setBlobURL] = useState(null);
+  const [chatHistory, setChatHistory] = useState([]);
+  const [currentMessage, setCurrentMessage] = useState(''); 
+  const [audioBlob, setAudioBlob] = useState(null); 
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const saveAudio = (audioBlob) => {
+    setIsLoading(true);
+    const myMessage = { sender: "me", audioBlob };
+    const messageList = [...messages, myMessage];
+
+    fetch(audioBlob)
+      .then((res) => res.blob())
+      .then(async (audioBlob) => {
+        const formData = new FormData();
+        formData.append("file", audioBlob, "audio.wav");
+        await axios.post("http://localhost:8000/post_audio", formData, { headers: { 'Content-Type': 'multipart/form-data' }, responseType: 'arraybuffer' })
+          .then((response) => {
+            const blob = response.data;
+            const audio = new Audio();
+            audio.src = createBlobURL(blob);
+            const responseAudio = { sender: "Celia", audioBlob: audio.src };
+            messageList.push(responseAudio);
+            setMessages(messageList);
+            setIsLoading(false);
+            audio.play();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      });
+  };
+
+  function createBlobURL(data) {
+    const blob = new Blob([data], { type: "audio/mpeg" });
+    const url = window.URL.createObjectURL(blob);
+    return url;
+  }
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center">
@@ -53,29 +92,7 @@ function Homepage() {
         />
 
         <div>
-          <ReactMediaRecorder
-            audio
-            render={({
-              status,
-              startRecording,
-              stopRecording,
-              mediaBlobUrl,
-            }) => (
-              <div>
-                <p>{status}</p>
-                <button
-                  onClick={
-                    status === "recording" ? stopRecording : startRecording
-                  }
-                  className="mt-2 border-2 flex justify-center p-1 rounded-full"
-                >
-                  <KeyboardVoiceIcon />
-                </button>
-
-                <video src={mediaBlobUrl} controls autoPlay loop />
-              </div>
-            )}
-          />
+          <Recorder handleStop={saveAudio} />
         </div>
       </div>
     </div>

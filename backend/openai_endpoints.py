@@ -53,7 +53,7 @@ def get_response(input_message):
             messages=messages,
         )
         print(response)
-        message_string = response["choices"][0]["message"]["content"]
+        message_string = response.choices[0].message
         return message_string
     except Exception as e:
         print(e)
