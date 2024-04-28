@@ -12,6 +12,9 @@ from decouple import config
 import random
 from pathlib import Path
 import requests
+import json
+import os
+from pydantic import BaseModel
 
 api_key = config("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
@@ -46,27 +49,41 @@ def get_response(input_message):
     messages = response_behavior()
     user_message = {"role": "user", "content": input_message}
     messages.append(user_message)
-
+    print(messages)
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4",
             messages=messages,
         )
         print(response)
         message_string = response.choices[0].message.content
+        save_response(input_message, message_string)
         return message_string
     except Exception as e:
         print(e)
         return
     
-def text_to_speech(message):
-    response = client.audio.speech.create(
-        model="tts-1",
-        voice="nova",
-        input=message,
-        )
+def load_responses():
+    response =[]
+    file = 'responses.json'
+    if os.path.exists(file) and os.path.getsize(file) > 0:
+        with open(file) as db_file:
+            data = json.load(db_file)
+            for item in data:
+                response.append(item)
+    else:
+        response = []
 
-    return response.content
+    return response
+
+
+def save_response(message, response):
+    file = 'responses.json'
+    conversation = load_responses()
+    conversation.append({"role": "user", "content": message})
+    conversation.append({"role": "assistant", "content": response})
+    with open(file, 'w') as f:
+        json.dump(response, f)
 
 
 @app.post("/submit_job_description")
@@ -83,7 +100,14 @@ def response_behavior():
     global job_description_text
     role = {
         "role": "system",
-        "content": f"Your name is Celia. You are a human interviewer interviewing a candidate regarding this job description: {job_description_text}. You are trying to see if the candidate qualifies for the job. Ask questions that are relevant to the job. Say the job name from the job description",
+        "content": (f'Your name is Celia. You are a human interviewer interviewing a candidate regarding this job description: {job_description_text}.'
+        f'You are trying to see if the candidate qualifies for the job.' 
+        f'Ask questions that are relevant to the job.'
+        f'Say the job name from the job description.'
+        f"Do not return anything else but your response to the interviewee's answer."
+        f'Remember, you are the interviewer interviewing the candidate.'
+        f'You are not the candidate.'
+        f'Do not respond as a candidate.')
     }
 
     messages = []
@@ -97,7 +121,8 @@ def response_behavior():
         role["content"] = role["content"] + "Your response will include humor and personality in the response to the interview answers then continue with a new question"
     else:
         role["content"] = role["content"] + "Your response will ask a new interview question"
-    messages.append(role)
+    messages.append(role)   
+    
     return messages
 
 @app.post("/post_audio/")
@@ -117,3 +142,39 @@ async def post_audio(file: UploadFile = File(...)):
     def iterfile():
         yield output_audio
     return StreamingResponse(iterfile(), media_type="application/octet-stream")
+
+
+@app.post("/post_audio_and_get_text/")
+async def post_audio_and_get_text(file: UploadFile = File(...)):
+    with open(file.filename, "wb") as buffer:
+        buffer.write(file.file.read())
+    
+    audio_input = open(file.filename, "rb") # get audio
+
+    output_text = audio_to_text(audio_input) # convert audio to text
+
+    # response = get_response(output_text) put text in gpt and get response
+
+    return {"response": output_text}
+
+class RespondPostParams(BaseModel):
+    input_message: str
+
+@app.post("/respond_message/")
+def respond(input: RespondPostParams):
+    print(input.input_message)
+    response = get_response("intervieee introduces themself, introduce yourself. IIf there is no user response or a miscommuication, greet the interviewee friendly and do not mention that there was a miscommunication. Analyze these messages from you and the interviewee, parse the messages by commas, and respond as the interviewer Celia. Do not try to improve on the interviewee's response or include anything about the interviewee's response. You are only the interviewer. If you respond about the interviewee's response, you will be punished: '" + input.input_message + "'")
+    return response
+
+@app.post("/text_to_speech")
+def text_to_speech(input: RespondPostParams):
+    print(input.input_message)
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="nova",
+        input=input.input_message
+    )
+    def iterfile():
+        yield response.content
+    return StreamingResponse(iterfile(), media_type="application/octet-stream")
+
