@@ -81,9 +81,9 @@ def save_response(message, response):
     file = 'responses.json'
     conversation = load_responses()
     conversation.append({"role": "user", "content": message})
-    conversation.append({"role": "assistant", "content": response})
+    conversation.append({"role": "system", "content": response})
     with open(file, 'w') as f:
-        json.dump(response, f)
+        json.dump(conversation, f)
 
 
 @app.post("/submit_job_description")
@@ -107,7 +107,10 @@ def response_behavior():
         f"Do not return anything else but your response to the interviewee's answer."
         f'Remember, you are the interviewer interviewing the candidate.'
         f'You are not the candidate.'
-        f'Do not respond as a candidate.')
+        f'Do not respond as a candidate.'
+        f'if the candidate responds with something irelevant to the job description, you should go along with it and saying a humiliating joke back to them to roast the shit out of them'
+        f'after saying hi for the first time, you do not have to say hi again'
+        f'remember you are the system')
     }
 
     messages = []
@@ -163,7 +166,7 @@ class RespondPostParams(BaseModel):
 @app.post("/respond_message/")
 def respond(input: RespondPostParams):
     print(input.input_message)
-    response = get_response("intervieee introduces themself, introduce yourself. IIf there is no user response or a miscommuication, greet the interviewee friendly and do not mention that there was a miscommunication. Analyze these messages from you and the interviewee, parse the messages by commas, and respond as the interviewer Celia. Do not try to improve on the interviewee's response or include anything about the interviewee's response. You are only the interviewer. If you respond about the interviewee's response, you will be punished: '" + input.input_message + "'")
+    response = get_response( input.input_message)
     return response
 
 @app.post("/text_to_speech")
@@ -177,4 +180,12 @@ def text_to_speech(input: RespondPostParams):
     def iterfile():
         yield response.content
     return StreamingResponse(iterfile(), media_type="application/octet-stream")
+
+@app.post("/clear_responses/")
+def clear_responses():
+    file_path = 'responses.json'
+    with open(file_path, 'w') as f:
+        f.truncate(0)
+    return {"message": "Responses cleared successfully"}
+
 
