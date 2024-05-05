@@ -115,9 +115,10 @@ function Homepage() {
   };
 
   const messageResponseFunction = async () => {
-    const messageInput = totalMessages.toString();
-    console.log(messageInput);
-    const response = await axios.post("http://localhost:8000/respond_message", { input_message: messageInput });
+    // const messageInput = totalMessages.toString();
+    // console.log(messageInput);
+    console.log("messages:", messages);
+    const response = await axios.post("http://localhost:8000/respond_message", { input_message: messages.toString()});
     console.log(response.data)
     setBotMessages([...botMessages, "Celia: " +  response.data])
   }
@@ -142,6 +143,22 @@ function Homepage() {
       console.error("Error:", error);
     });
   }
+
+  const clearResponses = async () => {
+    try {
+        const response = await axios.post("http://localhost:8000/clear_responses/");
+        console.log(response.data.message);
+        // Optionally, you can update the state or perform other actions after clearing responses
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+useEffect(() => {
+    if (totalMessages.length === 0) {
+        clearResponses();
+    }
+}, [totalMessages]);
   return (
     <div className="w-full min-h-screen flex items-center justify-center gap-4">
         <div className="w-2/5 h-128 rounded-2xl drop-shadow-lg bg-slate-100 relative p-4">
