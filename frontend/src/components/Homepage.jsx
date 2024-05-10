@@ -28,6 +28,7 @@ function Homepage() {
   const [user] = useAuthState(auth);
   const [showAlert, setShowAlert] = useState(false);
   const [totalMessages, setTotalMessages] = useState([]);
+  const [isSubmit, setIsSubmit] = useState(false);
 
   
   const prevMessages = useRef([]);
@@ -83,7 +84,9 @@ function Homepage() {
     axios.post('http://localhost:8080/set_job_description_for_user', {
       text: jobDescription, uid: user.uid}).then((response) => {
         console.log(jobDescription);
+        clearResponses();
         messageResponseFunction();
+        setIsSubmit(true);
       })
       .catch((error) => {
         console.error("Error:", error); 
@@ -200,7 +203,11 @@ useEffect(() => {
         ))}
       </div>
       <div className="ml-30">
+        {isSubmit ?
           <Recorder handleStop={saveAudio} />
+          : <div>Submit a job description!</div>
+        }
+          
         </div>
     </div>
   );
