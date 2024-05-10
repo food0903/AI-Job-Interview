@@ -62,6 +62,8 @@ function Homepage() {
     prevMessages.current = messages;
     prevBotMessages.current = botMessages;
 
+    console.log('Total messages:', totalMessages);
+
 }, [messages, botMessages]);
 
 
@@ -77,9 +79,11 @@ function Homepage() {
       setShowAlert(true);
       return; // Do not proceed with submission
     }
-    axios.post('http://localhost:8000/submit_job_description', {
-      description: jobDescription}).then((response) => {
+    
+    axios.post('http://localhost:8080/set_job_description_for_user', {
+      text: jobDescription, uid: user.uid}).then((response) => {
         console.log(jobDescription);
+        messageResponseFunction();
       })
       .catch((error) => {
         console.error("Error:", error); 
@@ -90,12 +94,13 @@ function Homepage() {
     const myMessage = { sender: "me", audioBlob };
     const messageList = [...messages, myMessage];
 
+    console.log(audioBlob);
     fetch(audioBlob)
       .then((res) => res.blob())
       .then(async (audioBlob) => {
         const formData = new FormData();
         formData.append("file", audioBlob, "audio.wav");
-        await axios.post("http://localhost:8000/post_audio_and_get_text", formData, { headers: { 'Content-Type': 'multipart/form-data' }})
+        axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' }})
           .then((response) => {
             /*const blob = response.data;
             const audio = new Audio();
@@ -106,7 +111,8 @@ function Homepage() {
             setIsLoading(false);
             audio.play();
             */  
-            setMessages([...messages, user.displayName + ": " + response.data.response])
+           axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user" })
+            setMessages([...messages, user.displayName + ": " + response.data.text])
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -118,8 +124,9 @@ function Homepage() {
     // const messageInput = totalMessages.toString();
     // console.log(messageInput);
     console.log("messages:", messages);
-    const response = await axios.post("http://localhost:8000/respond_message", { input_message: messages.toString()});
+    const response = await axios.post("http://localhost:8080/fetch_response", { uid: user.uid });
     console.log(response.data)
+    await axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data, role: "assistant" })
     setBotMessages([...botMessages, "Celia: " +  response.data])
   }
 
@@ -129,8 +136,8 @@ function Homepage() {
     return url;
   }
 
-  const receiveMessageAudioOutput = async (input) => {
-    await axios.post("http://localhost:8000/text_to_speech", {input_message: input}, { responseType: 'arraybuffer' })
+  const receiveMessageAudioOutput = async (text) => {
+    await axios.post("http://localhost:8080/text_to_speech", {text}, { responseType: 'arraybuffer' })
     .then((response) => {
       const blob = response.data;
       const audio = new Audio();
@@ -146,7 +153,7 @@ function Homepage() {
 
   const clearResponses = async () => {
     try {
-        const response = await axios.post("http://localhost:8000/clear_responses/");
+        const response = await axios.delete(`http://localhost:8080/delete_messages/${user.uid}`);
         console.log(response.data.message);
         // Optionally, you can update the state or perform other actions after clearing responses
     } catch (error) {
@@ -164,14 +171,14 @@ useEffect(() => {
         <div className="w-2/5 h-128 rounded-2xl drop-shadow-lg bg-slate-100 relative p-4">
             <h1 className="font-bold text-2xl">Job Description</h1>
             <TextField
-          sx={{ width: "100%", mt: 1 }}
-          id="response"
-          placeholder="Job Description"
-          onChange={(e) => setJobDescription(e.target.value)}
-          multiline 
-          rows={26}
-          inputProps={{ style: { fontSize: "0.8rem" } }}
-        />
+              sx={{ width: "100%", mt: 1 }}
+              id="response"
+              placeholder="Job Description"
+              onChange={(e) => setJobDescription(e.target.value)}
+              multiline 
+              rows={26}
+              inputProps={{ style: { fontSize: "0.8rem" } }}
+            />
        
         <div className="w-full flex justify-center">
           <Button onClick={submitJobDescription} sx={{mt: 1}}variant="contained">Submit</Button>

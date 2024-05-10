@@ -20,12 +20,12 @@ def add_message_to_db(role: str, content: str, uid: int):
     timestamp = datetime.now()
     db.collection("messages").add({"role": role, "content": content, "uid": uid, "timestamp": timestamp})
 
-def fetch_messages_from_db_for_gpt(uid: int):
+def fetch_messages_from_db_for_gpt(uid: str):
     """
     Fetches messages from the Firestore database
 
     :param uid: The user id of the user
-    :type uid: int
+    :type uid: str
     :return: A list of message objects consisting of the role, contents of the message depending on the user ID
     :return: list
     """
@@ -36,7 +36,7 @@ def fetch_messages_from_db_for_gpt(uid: int):
     return messages
 
 
-def clear_messages_for_user(uid: int):
+def clear_messages_for_user(uid: str):
     """
     Deletes all messages for a specific user from the Firestore database
 
@@ -48,6 +48,40 @@ def clear_messages_for_user(uid: int):
 
     for message in messages_for_user:
         message.reference.delete()
+
+def set_job_description(uid: str, job_description: str):
+    """
+    Sets job description for user in the Firestore database
+
+    :param uid: The user id of the user
+    :type uid: int
+    """
+    job_descriptions_ref = db.collection("job_descriptions")
+    job_descriptions_ref.document(uid).set({
+        'description': job_description
+    })
+
+def get_job_description(uid: str):
+    """
+    Gets job description for user in the Firestore database
+
+    :param uid: The user id of the user
+    :type uid: int
+    :return: The job description for the user
+    :return: str
+    """
+    job_descriptions_ref = db.collection("job_descriptions")
+    document = job_descriptions_ref.document(uid).get()
+
+    if document.exists:
+        job_description = document.to_dict()
+        return job_description.get('description')
+    else:
+        return None
+
+
+
+
 
 #add_message_to_db("assistant", "What is your qualifications?", 1)
 #add_message_to_db("user", "I am a software engineer", 1)

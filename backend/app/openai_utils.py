@@ -1,7 +1,7 @@
 from openai import OpenAI
 import os
 import random
-from app.firebase_utils import add_message_to_db, fetch_messages_from_db_for_gpt
+from app.firebase_utils import add_message_to_db, fetch_messages_from_db_for_gpt, get_job_description
 
 # OpenAI instance
 client = OpenAI(
@@ -9,9 +9,36 @@ client = OpenAI(
 )
 
 
-def root_test():
-    return run_gpt_query(fetch_messages_from_db_for_gpt(1))
+def fetch_assistant_response(user_id: int):
+    """
+    Fetches the assistant response from the OpenAI GPT API based on the user ID which
+    will be used to fetch the message history from the Firestore database.
 
+
+    :param user_id: The user ID of the user
+    :type user_id: int
+    :return: The response from the GPT API
+    :return: str
+    
+    """
+    description = get_job_description(user_id)
+    return run_gpt_query(fetch_messages_from_db_for_gpt(user_id), description)
+
+def text_to_audio_response(text: str):
+    """
+    Runs the query for the OpenAI Text to Speech API and returns the response from the API
+    in the form of an audio file.
+    :param text: The text to be converted to audio
+    :type text: str
+    :return: The audio response from the API
+
+    """
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="nova",
+        input=text
+    )
+    return response
 
 # Helper functions
 def audio_to_text(file_path):
@@ -32,7 +59,7 @@ def audio_to_text(file_path):
         print(e)
         return
 
-def run_gpt_query(message_history: list) -> str:
+def run_gpt_query(message_history: list, job_description_text: str = "Music industry copyright striker") -> str:
     """
     Runs the query for the OpenAI GPT API and returns the response from the API. 
 
@@ -45,7 +72,7 @@ def run_gpt_query(message_history: list) -> str:
     :return: list
     """
 
-    messages = response_behavior("Strip club. Hiring 18+ Only!")
+    messages = response_behavior(job_description_text)
     messages.extend(message_history)
     
     chat_completion = client.chat.completions.create(
@@ -53,7 +80,7 @@ def run_gpt_query(message_history: list) -> str:
         model="gpt-3.5-turbo")
     return chat_completion.choices[0].message.content
 
-def response_behavior(job_description_text: str) -> list:
+def response_behavior(job_description_text: str = "") -> list:
     """
     Function to generate the response behavior for the GPT chatbot in terms of what Celia is interviewing about
     and what type of question should Celia be asking.
