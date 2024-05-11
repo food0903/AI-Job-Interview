@@ -28,11 +28,11 @@ function Sidebar() {
         <div className="w-[260px] bg-slate-100 h-screen">
             <div className="h-1/2 w-full flex flex-col items-center p-2">
 
-                <motion.div whileHover={{ scale: 1.03 }} className="w-4/5 text-blue-600 mt-12 bg-white drop-shadow-xl rounded-2xl h-12 gap-x-4 items-center flex flex-row justify-center font-nunito border-1">
+                <motion.div whileHover={{ scale: 1.1 }} className="w-4/5 text-blue-600 mt-12 bg-white drop-shadow-xl rounded-2xl h-[50px] gap-x-2 items-center flex flex-row justify-center font-nunito hover:cursor-pointer">
                     <CallIcon />
                     <span>Talk with Celia</span>
                 </motion.div>
-                <motion.div whileHover={{ scale: 1.03 }} className="w-4/5 mt-6 drop-shadow-xl rounded-2xl h-12 gap-x-4 items-center flex flex-row justify-center font-nunito">
+                <motion.div whileHover={{ scale: 1.1 }} className="w-4/5 mt-6 drop-shadow-xl rounded-2xl h-[50px] gap-x-4 items-center flex flex-row justify-center font-nunito hover:cursor-pointer">
                     <GradingIcon className="text-black" />
                     <span>History</span>
                 </motion.div>

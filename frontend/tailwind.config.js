@@ -11,6 +11,12 @@ export default {
       },
       fontFamily: {
         "nunito": ["Nunito", "sans-serif"],
+      },
+      height: {
+        'custom': '98%', 
+      },
+      width: {
+        'custom': '83%', 
       }
     },
   },

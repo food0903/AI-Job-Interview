@@ -5,7 +5,8 @@ import {
   Typography,
   TextField,
   Button, 
-  Alert
+  Alert,
+  Avatar
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -17,6 +18,7 @@ import Recorder from "./Recorder";
 import axios from "axios";
 import { useAuthState } from "react-firebase-hooks/auth";
 import Sidebar from "./Sidebar";
+import SidebarLayout from "./SidebarLayout";
 
 function Homepage() {
   const [currentMessage, setCurrentMessage] = useState(''); 
@@ -44,16 +46,18 @@ function Homepage() {
 
     // Process the changed message
     let lastMessage = null;
-    if (changedMessages !== null) {
+    if (changedMessages != null) {
         // Handle changed messages
         console.log('Messages changed:', changedMessages);  
         lastMessage = changedMessages.slice(-1)[0];
     }
-    if (changedBotMessages !== null) {
+    if (changedBotMessages != null) {
         // Handle changed bot messages
         console.log('Bot messages changed:', changedBotMessages);
         lastMessage = changedBotMessages.slice(-1)[0];
-        receiveMessageAudioOutput(lastMessage);
+        if (lastMessage != null) {
+          receiveMessageAudioOutput(lastMessage.content);
+        }
     }
 
     if (lastMessage != null) {
@@ -115,7 +119,7 @@ function Homepage() {
         axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' }})
           .then((response) => {
            axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user" })
-            setMessages([...messages, user.displayName + ": " + response.data.text])
+            setMessages([...messages, {role: "User", content: response.data.text}])
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -129,7 +133,7 @@ function Homepage() {
     const response = await axios.post("http://localhost:8080/fetch_response", { uid: user.uid });
     console.log(response.data)
     await axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data, role: "assistant" })
-    setBotMessages([...botMessages, "Celia: " +  response.data])
+    setBotMessages([...botMessages, {role: "Celia", content: response.data} ])
   }
 
   function createBlobURL(data) {
@@ -171,47 +175,67 @@ useEffect(() => {
     }
 }, [totalMessages]);
   return (
-    <div className="w-full h-screen min-h-screen flex items-center justify-start gap-4">
-      <Sidebar />
-        <div className="w-2/5 h-full p-4 rounded-2xl drop-shadow-lg bg-slate-100 relative">
-            <h1 className="font-bold text-2xl">Job Description</h1>
-            <TextField
-              sx={{ width: "100%", mt: 1 }}
-              id="response"
-              placeholder="Job Description"
-              onChange={(e) => setJobDescription(e.target.value)}
-              multiline 
-              rows={26}
-              inputProps={{ style: { fontSize: "0.8rem" } }}
-            />
-       
-        <div className="w-full flex justify-center">
-          <Button onClick={submitJobDescription} sx={{mt: 1}}variant="contained">Submit</Button>
-        </div>
-        {showAlert && (
-          <Alert severity="error" sx={{ mt: 1 }}>
-            Please enter the job description.
-          </Alert>
-        )}
+    <SidebarLayout>
+      <div className="w-full h-full mt-2 ml-2 flex items-center justify-start gap-x-4">
+      
+          <div className="w-2/5 h-[900px] p-4 rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto no-scrollbar">
+              <h1 className="font-bold text-2xl font-nunito">Job Description</h1>
+              <TextField
+                sx={{ width: "100%", mt: 1 }}
+                id="response"
+                placeholder="Job Description"
+                onChange={(e) => setJobDescription(e.target.value)}
+                multiline 
+                rows={26}
+                inputProps={{ style: { fontSize: "0.8rem" } }}
+              />
+        
+          <div className="w-full flex justify-center">
+            <Button onClick={submitJobDescription} sx={{mt: 1}}variant="contained">Submit</Button>
+          </div>
+          {showAlert && (
+            <Alert severity="error" sx={{ mt: 1 }}>
+              Please enter the job description.
+            </Alert>
+          )}
 
+          </div>
+        <div className="w-128 p-4 h-4/5 rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto gap-4 flex flex-col">
+          { totalMessages.map((message) => (
+            <>
+            { message.role === "User" && 
+            <div className="flex flex-row justify-end gap-x-2">
+                <div className="p-2 bg-slate-300 drop-shadow-lg rounded-2xl">
+                  <Typography sx={{ fontWeight: "bold" }}>
+                    {message.content}
+                  </Typography>
+              </div>
+              <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
+            </div>
+          }
+          { message.role === "Celia" && 
+            <div className="flex flex-row justify-start gap-x-2">
+                <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
+                <div className="p-2 bg-slate-300 drop-shadow-lg rounded-2xl">
+                  <Typography sx={{ fontWeight: "bold" }}>
+                    {message.content}
+                  </Typography>
+              </div>
+
+            </div>
+          }
+          </>
+          ))}
         </div>
-      <div className="w-128 p-4 h-full rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto gap-4 flex flex-col">
-        { totalMessages.map((message) => (
-          <div className="p-2 bg-slate-300 drop-shadow-lg rounded-2xl">
-            <Typography sx={{ fontWeight: "bold" }}>
-              {message}
-            </Typography>
-        </div>
-        ))}
+        <div className="ml-30">
+          {isSubmit ?
+            <Recorder handleStop={saveAudio} />
+            : <div>Submit a job description!</div>
+          }
+            
+          </div>
       </div>
-      <div className="ml-30">
-        {isSubmit ?
-          <Recorder handleStop={saveAudio} />
-          : <div>Submit a job description!</div>
-        }
-          
-        </div>
-    </div>
+    </SidebarLayout>
   );
 }
 
