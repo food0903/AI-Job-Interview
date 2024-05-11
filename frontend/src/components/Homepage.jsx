@@ -75,9 +75,9 @@ function Homepage() {
 
 
   useEffect(() => {
-      messageResponseFunction();
+    messageResponseFunction();
   }, [messages])
-  
+
 
 
   useEffect(() => {
@@ -188,19 +188,30 @@ function Homepage() {
       <div className="w-full h-full mt-2 ml-2 flex items-center justify-center gap-x-4">
         {!isSubmit &&
           <div className="w-2/5 h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
-            <h1 className="font-bold text-2xl font-nunito">Enter a Job Description</h1>
+              <div className="flex flex-row justify-start gap-x-2 items-center">
+                <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
+                <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
+                  <Typography sx={{ color: "white", fontFamily: "nunito" }}>
+                    Hi! I'm Celia, your virtual job interviewer. To get started, please provide a job description.
+                    You can copy and paste any job description from any listing you find online or you can write
+                    a brief summary of any job description.
+                  </Typography>
+                </div>
+              </div>
+
             <TextField
-              sx={{ width: "100%", mt: 1 }}
+              sx={{ width: "100%", mt: 2 }}
               id="response"
               placeholder="Job Description"
               onChange={(e) => setJobDescription(e.target.value)}
               multiline
-              rows={26}
-              inputProps={{ style: { fontSize: "0.8rem" } }}
+              rows={20}
+              inputProps={{ style: { fontSize: "0.8rem", borderRadius: "20px" } }}
+              
             />
 
             <div className="w-full flex justify-center">
-              <Button onClick={submitJobDescription} sx={{ mt: 1 }} variant="contained">Submit</Button>
+              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2 }} variant="contained">Submit</Button>
             </div>
             {showAlert && (
               <Alert severity="error" sx={{ mt: 1 }}>
@@ -211,43 +222,43 @@ function Homepage() {
           </div>
         }
         {isSubmit &&
-          <div className="w-[900px] p-4 h-[1000px] rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto">
-            <div ref={chatRef} className="w-custom h-[850px] gap-4 flex flex-col overflow-y-auto no-scrollbar">
+          <div className="w-[900px] p-4 h-[800px] rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto">
+            <div ref={chatRef} className="w-custom h-[650px] gap-4 flex flex-col overflow-y-auto no-scrollbar">
               {conversationClearLoading &&
-              <>
-              {
-                totalMessages.map((message) => (
-                  <>
-                    {message.role === "User" &&
-                      <div className="flex flex-row justify-end gap-x-2 items-center">
-                        <div className="p-2 bg-slate-200  max-w-[600px]  drop-shadow-lg rounded-2xl">
-                          <Typography sx={{ fontFamily: "nunito" }}>
-                            {message.content}
-                          </Typography>
-                        </div>
-                        <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
-                      </div>
-                    }
-                    {message.role === "Celia" &&
-                      <div className="flex flex-row justify-start gap-x-2 items-center">
-                        <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
-                        <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
-                          <Typography sx={{ color: "white", fontFamily: "nunito" }}>
-                            {message.content}
-                          </Typography>
-                        </div>
+                <>
+                  {
+                    totalMessages.map((message) => (
+                      <>
+                        {message.role === "User" &&
+                          <div className="flex flex-row justify-end gap-x-2 items-center">
+                            <div className="p-2 bg-slate-200  max-w-[600px]  drop-shadow-lg rounded-2xl">
+                              <Typography sx={{ fontFamily: "nunito" }}>
+                                {message.content}
+                              </Typography>
+                            </div>
+                            <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
+                          </div>
+                        }
+                        {message.role === "Celia" &&
+                          <div className="flex flex-row justify-start gap-x-2 items-center">
+                            <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
+                            <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
+                              <Typography sx={{ color: "white", fontFamily: "nunito" }}>
+                                {message.content}
+                              </Typography>
+                            </div>
 
-                      </div>
-                    }
+                          </div>
+                        }
 
 
 
-                  </>
-                ))
+                      </>
+                    ))
+                  }
+                </>
               }
-              </>
-              }
-             
+
             </div>
 
 
