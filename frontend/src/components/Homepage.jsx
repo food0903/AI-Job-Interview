@@ -29,12 +29,12 @@ function Homepage() {
   const [showAlert, setShowAlert] = useState(false);
   const [totalMessages, setTotalMessages] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
+  const [listOfAudio, setListOfAudio] = useState([]);
 
   
   const prevMessages = useRef([]);
   const prevBotMessages = useRef([]);
 
-    
 
   useEffect(() => {
     // Determine which dependency changed
@@ -55,7 +55,7 @@ function Homepage() {
         receiveMessageAudioOutput(lastMessage);
     }
 
-    if (lastMessage !== null) {
+    if (lastMessage != null) {
         setTotalMessages(prevTotalMessages => [...prevTotalMessages, lastMessage]);
     }
 
@@ -73,6 +73,14 @@ function Homepage() {
       messageResponseFunction();
     }
   }, [messages])
+  
+  const clearResponsesAndTotalMessages = async () => {
+      await clearResponses();
+      messageResponseFunction();
+      setTotalMessages([]);
+      listOfAudio.forEach(audio => audio.pause());
+      setIsSubmit(true);
+  }
 
   const submitJobDescription = () => {
     if (jobDescription.trim() === '') {
@@ -84,8 +92,7 @@ function Homepage() {
     axios.post('http://localhost:8080/set_job_description_for_user', {
       text: jobDescription, uid: user.uid}).then((response) => {
         console.log(jobDescription);
-        clearResponses();
-        messageResponseFunction();
+        clearResponsesAndTotalMessages();
         setIsSubmit(true);
       })
       .catch((error) => {
@@ -94,6 +101,7 @@ function Homepage() {
   }
   const saveAudio = (audioBlob) => {
     setIsLoading(true);
+    listOfAudio.forEach(audio => audio.pause());
     const myMessage = { sender: "me", audioBlob };
     const messageList = [...messages, myMessage];
 
@@ -105,15 +113,6 @@ function Homepage() {
         formData.append("file", audioBlob, "audio.wav");
         axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' }})
           .then((response) => {
-            /*const blob = response.data;
-            const audio = new Audio();
-            audio.src = createBlobURL(blob);
-            const responseAudio = { sender: "Celia", audioBlob: audio.src };
-            messageList.push(responseAudio);
-            setMessages(messageList);
-            setIsLoading(false);
-            audio.play();
-            */  
            axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user" })
             setMessages([...messages, user.displayName + ": " + response.data.text])
           })
@@ -124,8 +123,7 @@ function Homepage() {
   };
 
   const messageResponseFunction = async () => {
-    // const messageInput = totalMessages.toString();
-    // console.log(messageInput);
+
     console.log("messages:", messages);
     const response = await axios.post("http://localhost:8080/fetch_response", { uid: user.uid });
     console.log(response.data)
@@ -148,6 +146,8 @@ function Homepage() {
       setIsLoading(false);
       console.log("audio ", audio);
       audio.play(); 
+
+      setListOfAudio([...listOfAudio, audio]);
     })
     .catch((error) => { 
       console.error("Error:", error);
@@ -170,8 +170,8 @@ useEffect(() => {
     }
 }, [totalMessages]);
   return (
-    <div className="w-full min-h-screen flex items-center justify-center gap-4">
-        <div className="w-2/5 h-128 rounded-2xl drop-shadow-lg bg-slate-100 relative p-4">
+    <div className="w-full h-screen min-h-screen flex items-center justify-start gap-4">
+        <div className="w-2/5 h-full p-4 rounded-2xl drop-shadow-lg bg-slate-100 relative">
             <h1 className="font-bold text-2xl">Job Description</h1>
             <TextField
               sx={{ width: "100%", mt: 1 }}
@@ -193,7 +193,7 @@ useEffect(() => {
         )}
 
         </div>
-      <div className="w-1/3 p-4 h-128 rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto gap-4 flex flex-col">
+      <div className="w-128 p-4 h-full rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto gap-4 flex flex-col">
         { totalMessages.map((message) => (
           <div className="p-2 bg-slate-300 drop-shadow-lg rounded-2xl">
             <Typography sx={{ fontWeight: "bold" }}>
