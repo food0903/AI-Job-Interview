@@ -3,6 +3,8 @@ import { auth } from "../firebase";
 import Avatar from '@mui/material/Avatar';
 import { motion } from "framer-motion";
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
+import GradingIcon from '@mui/icons-material/Grading';
+import CallIcon from '@mui/icons-material/Call';
 import { DownOutlined } from '@ant-design/icons';
 import { Dropdown, Space } from 'antd';
 import { Menu, MenuItem } from "@mui/material"
@@ -24,10 +26,16 @@ function Sidebar() {
 
     return (
         <div className="w-[260px] bg-slate-100 h-screen">
-            <div className="h-1/2 flex flex-col">
-                <div>
-                    Header
-                </div>
+            <div className="h-1/2 w-full flex flex-col items-center p-2">
+
+                <motion.div whileHover={{ scale: 1.03 }} className="w-4/5 text-blue-600 mt-12 bg-white drop-shadow-xl rounded-2xl h-12 gap-x-4 items-center flex flex-row justify-center font-nunito border-1">
+                    <CallIcon />
+                    <span>Talk with Celia</span>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.03 }} className="w-4/5 mt-6 drop-shadow-xl rounded-2xl h-12 gap-x-4 items-center flex flex-row justify-center font-nunito">
+                    <GradingIcon className="text-black" />
+                    <span>History</span>
+                </motion.div>
             </div>
             <div className="h-1/2 flex flex-col px-1 justify-end items-center">
                 <div className="w-[200px] h-[60px] relative mb-2">
@@ -45,7 +53,7 @@ function Sidebar() {
                         <MenuItem sx={{fontFamily: "nunito"}} onClick={handleSignOut}>Logout</MenuItem>
                     </Menu>
           
-                    <motion.div onClick={() => setOpen(true)} whileHover={{ scale: 1.03 }} className="w-full h-full bg-[#FFFFFF] hover:bg-slate-50 transition duration-100 ease-in-out drop-shadow-md rounded-2xl">
+                    <motion.div onClick={() => setOpen(true)} whileHover={{ scale: 1.03 }} className="w-full h-full bg-[#FFFFFF] hover:bg-slate-50 transition duration-100 ease-in-out drop-shadow-md rounded-2xl hover:cursor-pointer">
                         <div className="flex h-full w-full gap-x-2 items-center p-1 max-w-full">
                             <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
                             <div className="flex flex-col flex-grow max-w-full">
