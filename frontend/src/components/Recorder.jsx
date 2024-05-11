@@ -13,11 +13,10 @@ function Recorder({ handleStop}) {
         <div>
             <button
                 onClick={status == "recording" ? stopRecording : startRecording} 
-                className="flex bg-white h-[6rem] w-[6rem] rounded-full items-center justify-center shadow-lg"
+                className="flex bg-white h-[4rem] w-[4rem] outline-none drop-shadow-md rounded-full items-center justify-center shadow-lg"
             >
-                <i className="bi bi-mic text-black text-6xl"></i>
+                {status == "recording" ? <i className="bi bi-mic text-red-500 text-2xl"></i> : <i className="bi bi-mic text-black text-2xl"></i>}
             </button>
-            <p>{status}</p>
         </div>
         )} 
         />

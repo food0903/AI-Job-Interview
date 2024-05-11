@@ -16,7 +16,7 @@ export default {
         'custom': '98%', 
       },
       width: {
-        'custom': '83%', 
+        'custom': '98%', 
       }
     },
   },

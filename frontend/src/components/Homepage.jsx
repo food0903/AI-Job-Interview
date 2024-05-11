@@ -34,7 +34,7 @@ function Homepage() {
   const [isSubmit, setIsSubmit] = useState(false);
   const [listOfAudio, setListOfAudio] = useState([]);
 
-  
+  const chatRef = useRef(null);
   const prevMessages = useRef([]);
   const prevBotMessages = useRef([]);
 
@@ -78,6 +78,12 @@ function Homepage() {
       messageResponseFunction();
     }
   }, [messages])
+
+  
+useEffect(() => {
+
+  chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
+}, [totalMessages]);
   
   const clearResponsesAndTotalMessages = async () => {
       await clearResponses();
@@ -200,38 +206,47 @@ useEffect(() => {
           )}
 
           </div>
-        <div className="w-128 p-4 h-4/5 rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto gap-4 flex flex-col">
-          { totalMessages.map((message) => (
-            <>
-            { message.role === "User" && 
-            <div className="flex flex-row justify-end gap-x-2">
-                <div className="p-2 bg-slate-300 drop-shadow-lg rounded-2xl">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    {message.content}
-                  </Typography>
+        <div className="w-[900px] p-4 h-[1000px] rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto">
+          <div ref={chatRef} className="w-custom h-[850px] gap-4 flex flex-col overflow-y-auto no-scrollbar">
+            { totalMessages.map((message) => (
+              <>
+              { message.role === "User" && 
+              <div className="flex flex-row justify-end gap-x-2 items-center">
+                  <div className="p-2 bg-slate-200  max-w-[600px]  drop-shadow-lg rounded-2xl">
+                    <Typography sx={{fontFamily: "nunito"}}>
+                      {message.content}
+                    </Typography>
+                </div>
+                <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
               </div>
-              <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
-            </div>
-          }
-          { message.role === "Celia" && 
-            <div className="flex flex-row justify-start gap-x-2">
-                <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
-                <div className="p-2 bg-slate-300 drop-shadow-lg rounded-2xl">
-                  <Typography sx={{ fontWeight: "bold" }}>
-                    {message.content}
-                  </Typography>
-              </div>
+            }
+            { message.role === "Celia" && 
+              <div className="flex flex-row justify-start gap-x-2 items-center">
+                  <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
+                  <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
+                    <Typography sx={{ color: "white", fontFamily: "nunito" }}>
+                      {message.content}
+                    </Typography>
+                </div>
 
-            </div>
-          }
+              </div>
+            }
+    
+          
+
           </>
           ))}
+          </div>
+          
+           {isSubmit &&
+           <div className="flex justify-center h-[100px] items-end">
+              <Recorder handleStop={saveAudio} />
+            </div>
+         
+            }
         </div>
         <div className="ml-30">
-          {isSubmit ?
-            <Recorder handleStop={saveAudio} />
-            : <div>Submit a job description!</div>
-          }
+         
             
           </div>
       </div>
