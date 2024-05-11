@@ -8,6 +8,9 @@ export default {
     extend: {
       spacing: {
         '128': '48rem',
+      },
+      fontFamily: {
+        "nunito": ["Nunito", "sans-serif"],
       }
     },
   },

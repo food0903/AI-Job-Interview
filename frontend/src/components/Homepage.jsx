@@ -16,6 +16,7 @@ import { ReactMediaRecorder } from "react-media-recorder";
 import Recorder from "./Recorder";
 import axios from "axios";
 import { useAuthState } from "react-firebase-hooks/auth";
+import Sidebar from "./Sidebar";
 
 function Homepage() {
   const [currentMessage, setCurrentMessage] = useState(''); 
@@ -171,6 +172,7 @@ useEffect(() => {
 }, [totalMessages]);
   return (
     <div className="w-full h-screen min-h-screen flex items-center justify-start gap-4">
+      <Sidebar />
         <div className="w-2/5 h-full p-4 rounded-2xl drop-shadow-lg bg-slate-100 relative">
             <h1 className="font-bold text-2xl">Job Description</h1>
             <TextField
