@@ -4,7 +4,7 @@ import {
   PaginationItem,
   Typography,
   TextField,
-  Button, 
+  Button,
   Alert,
   Avatar
 } from "@mui/material";
@@ -21,18 +21,19 @@ import Sidebar from "./Sidebar";
 import SidebarLayout from "./SidebarLayout";
 
 function Homepage() {
-  const [currentMessage, setCurrentMessage] = useState(''); 
-  const [audioBlob, setAudioBlob] = useState(null); 
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [audioBlob, setAudioBlob] = useState(null);
   const [messages, setMessages] = useState([]);
   const [botMessages, setBotMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
-  const [response, setResponse] = useState(null); 
+  const [response, setResponse] = useState(null);
   const [user] = useAuthState(auth);
   const [showAlert, setShowAlert] = useState(false);
   const [totalMessages, setTotalMessages] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
   const [listOfAudio, setListOfAudio] = useState([]);
+  const [conversationClearLoading, setConversationClearLoading] = useState(false);
 
   const chatRef = useRef(null);
   const prevMessages = useRef([]);
@@ -47,21 +48,21 @@ function Homepage() {
     // Process the changed message
     let lastMessage = null;
     if (changedMessages != null) {
-        // Handle changed messages
-        console.log('Messages changed:', changedMessages);  
-        lastMessage = changedMessages.slice(-1)[0];
+      // Handle changed messages
+      console.log('Messages changed:', changedMessages);
+      lastMessage = changedMessages.slice(-1)[0];
     }
     if (changedBotMessages != null) {
-        // Handle changed bot messages
-        console.log('Bot messages changed:', changedBotMessages);
-        lastMessage = changedBotMessages.slice(-1)[0];
-        if (lastMessage != null) {
-          receiveMessageAudioOutput(lastMessage.content);
-        }
+      // Handle changed bot messages
+      console.log('Bot messages changed:', changedBotMessages);
+      lastMessage = changedBotMessages.slice(-1)[0];
+      if (lastMessage != null) {
+        receiveMessageAudioOutput(lastMessage.content);
+      }
     }
 
     if (lastMessage != null) {
-        setTotalMessages(prevTotalMessages => [...prevTotalMessages, lastMessage]);
+      setTotalMessages(prevTotalMessages => [...prevTotalMessages, lastMessage]);
     }
 
     // Update previous values for the next comparison
@@ -70,27 +71,28 @@ function Homepage() {
 
     console.log('Total messages:', totalMessages);
 
-}, [messages, botMessages]);
+  }, [messages, botMessages]);
 
 
   useEffect(() => {
-    if (jobDescription != "") {
       messageResponseFunction();
-    }
   }, [messages])
-
   
-useEffect(() => {
 
-  chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
-}, [totalMessages]);
-  
+
+  useEffect(() => {
+
+    chatRef.current && chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
+  }, [totalMessages]);
+
   const clearResponsesAndTotalMessages = async () => {
-      await clearResponses();
-      messageResponseFunction();
-      setTotalMessages([]);
-      listOfAudio.forEach(audio => audio.pause());
-      setIsSubmit(true);
+    setConversationClearLoading(false);
+    await clearResponses();
+    messageResponseFunction();
+    setTotalMessages([]);
+    setJobDescription('');
+    listOfAudio.forEach(audio => audio.pause());
+    setConversationClearLoading(true);
   }
 
   const submitJobDescription = () => {
@@ -99,15 +101,16 @@ useEffect(() => {
       setShowAlert(true);
       return; // Do not proceed with submission
     }
-    
+
     axios.post('http://localhost:8080/set_job_description_for_user', {
-      text: jobDescription, uid: user.uid}).then((response) => {
-        console.log(jobDescription);
-        clearResponsesAndTotalMessages();
-        setIsSubmit(true);
-      })
+      text: jobDescription, uid: user.uid
+    }).then((response) => {
+      console.log(jobDescription);
+      clearResponsesAndTotalMessages();
+      setIsSubmit(true);
+    })
       .catch((error) => {
-        console.error("Error:", error); 
+        console.error("Error:", error);
       });
   }
   const saveAudio = (audioBlob) => {
@@ -122,10 +125,10 @@ useEffect(() => {
       .then(async (audioBlob) => {
         const formData = new FormData();
         formData.append("file", audioBlob, "audio.wav");
-        axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' }})
+        axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' } })
           .then((response) => {
-           axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user" })
-            setMessages([...messages, {role: "User", content: response.data.text}])
+            axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user" })
+            setMessages([...messages, { role: "User", content: response.data.text }])
           })
           .catch((error) => {
             console.error("Error:", error);
@@ -139,7 +142,7 @@ useEffect(() => {
     const response = await axios.post("http://localhost:8080/fetch_response", { uid: user.uid });
     console.log(response.data)
     await axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data, role: "assistant" })
-    setBotMessages([...botMessages, {role: "Celia", content: response.data} ])
+    setBotMessages([...botMessages, { role: "Celia", content: response.data }])
   }
 
   function createBlobURL(data) {
@@ -149,106 +152,123 @@ useEffect(() => {
   }
 
   const receiveMessageAudioOutput = async (text) => {
-    await axios.post("http://localhost:8080/text_to_speech", {text}, { responseType: 'arraybuffer' })
-    .then((response) => {
-      const blob = response.data;
-      const audio = new Audio();
-      audio.src = createBlobURL(blob);
-      setIsLoading(false);
-      console.log("audio ", audio);
-      audio.play(); 
+    await axios.post("http://localhost:8080/text_to_speech", { text }, { responseType: 'arraybuffer' })
+      .then((response) => {
+        const blob = response.data;
+        const audio = new Audio();
+        audio.src = createBlobURL(blob);
+        setIsLoading(false);
+        console.log("audio ", audio);
+        isSubmit && audio.play();
 
-      setListOfAudio([...listOfAudio, audio]);
-    })
-    .catch((error) => { 
-      console.error("Error:", error);
-    });
+        setListOfAudio([...listOfAudio, audio]);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
   const clearResponses = async () => {
     try {
-        const response = await axios.delete(`http://localhost:8080/delete_messages/${user.uid}`);
-        console.log(response.data.message);
-        // Optionally, you can update the state or perform other actions after clearing responses
+      const response = await axios.delete(`http://localhost:8080/delete_messages/${user.uid}`);
+      console.log(response.data.message);
+      // Optionally, you can update the state or perform other actions after clearing responses
     } catch (error) {
-        console.error("Error:", error);
+      console.error("Error:", error);
     }
-}
+  }
 
-useEffect(() => {
+  useEffect(() => {
     if (totalMessages.length === 0) {
-        clearResponses();
+      clearResponses();
     }
-}, [totalMessages]);
+  }, [totalMessages]);
   return (
     <SidebarLayout>
-      <div className="w-full h-full mt-2 ml-2 flex items-center justify-start gap-x-4">
-      
-          <div className="w-2/5 h-[900px] p-4 rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto no-scrollbar">
-              <h1 className="font-bold text-2xl font-nunito">Job Description</h1>
-              <TextField
-                sx={{ width: "100%", mt: 1 }}
-                id="response"
-                placeholder="Job Description"
-                onChange={(e) => setJobDescription(e.target.value)}
-                multiline 
-                rows={26}
-                inputProps={{ style: { fontSize: "0.8rem" } }}
-              />
-        
-          <div className="w-full flex justify-center">
-            <Button onClick={submitJobDescription} sx={{mt: 1}}variant="contained">Submit</Button>
-          </div>
-          {showAlert && (
-            <Alert severity="error" sx={{ mt: 1 }}>
-              Please enter the job description.
-            </Alert>
-          )}
+      <div className="w-full h-full mt-2 ml-2 flex items-center justify-center gap-x-4">
+        {!isSubmit &&
+          <div className="w-2/5 h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
+            <h1 className="font-bold text-2xl font-nunito">Enter a Job Description</h1>
+            <TextField
+              sx={{ width: "100%", mt: 1 }}
+              id="response"
+              placeholder="Job Description"
+              onChange={(e) => setJobDescription(e.target.value)}
+              multiline
+              rows={26}
+              inputProps={{ style: { fontSize: "0.8rem" } }}
+            />
 
-          </div>
-        <div className="w-[900px] p-4 h-[1000px] rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto">
-          <div ref={chatRef} className="w-custom h-[850px] gap-4 flex flex-col overflow-y-auto no-scrollbar">
-            { totalMessages.map((message) => (
-              <>
-              { message.role === "User" && 
-              <div className="flex flex-row justify-end gap-x-2 items-center">
-                  <div className="p-2 bg-slate-200  max-w-[600px]  drop-shadow-lg rounded-2xl">
-                    <Typography sx={{fontFamily: "nunito"}}>
-                      {message.content}
-                    </Typography>
-                </div>
-                <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
-              </div>
-            }
-            { message.role === "Celia" && 
-              <div className="flex flex-row justify-start gap-x-2 items-center">
-                  <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
-                  <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
-                    <Typography sx={{ color: "white", fontFamily: "nunito" }}>
-                      {message.content}
-                    </Typography>
-                </div>
-
-              </div>
-            }
-    
-          
-
-          </>
-          ))}
-          </div>
-          
-           {isSubmit &&
-           <div className="flex justify-center h-[100px] items-end">
-              <Recorder handleStop={saveAudio} />
+            <div className="w-full flex justify-center">
+              <Button onClick={submitJobDescription} sx={{ mt: 1 }} variant="contained">Submit</Button>
             </div>
-         
-            }
-        </div>
-        <div className="ml-30">
-         
-            
+            {showAlert && (
+              <Alert severity="error" sx={{ mt: 1 }}>
+                Please enter the job description.
+              </Alert>
+            )}
+
           </div>
+        }
+        {isSubmit &&
+          <div className="w-[900px] p-4 h-[1000px] rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto">
+            <div ref={chatRef} className="w-custom h-[850px] gap-4 flex flex-col overflow-y-auto no-scrollbar">
+              {conversationClearLoading &&
+              <>
+              {
+                totalMessages.map((message) => (
+                  <>
+                    {message.role === "User" &&
+                      <div className="flex flex-row justify-end gap-x-2 items-center">
+                        <div className="p-2 bg-slate-200  max-w-[600px]  drop-shadow-lg rounded-2xl">
+                          <Typography sx={{ fontFamily: "nunito" }}>
+                            {message.content}
+                          </Typography>
+                        </div>
+                        <Avatar src={user.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
+                      </div>
+                    }
+                    {message.role === "Celia" &&
+                      <div className="flex flex-row justify-start gap-x-2 items-center">
+                        <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
+                        <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
+                          <Typography sx={{ color: "white", fontFamily: "nunito" }}>
+                            {message.content}
+                          </Typography>
+                        </div>
+
+                      </div>
+                    }
+
+
+
+                  </>
+                ))
+              }
+              </>
+              }
+             
+            </div>
+
+
+
+            <div className="flex justify-center h-[100px] gap-x-4 items-end">
+              <Recorder handleStop={saveAudio} />
+              <button
+                className="flex bg-white h-[4rem] w-[4rem] outline-none drop-shadow-md rounded-full items-center justify-center shadow-lg"
+                onClick={() => { setIsSubmit(false); clearResponsesAndTotalMessages(); }}
+              >
+                <ArrowBackIosNewIcon />
+              </button>
+            </div>
+
+
+          </div>
+        }
+        <div className="ml-30">
+
+
+        </div>
       </div>
     </SidebarLayout>
   );
