@@ -34,6 +34,7 @@ function Homepage() {
   const [isSubmit, setIsSubmit] = useState(false);
   const [listOfAudio, setListOfAudio] = useState([]);
   const [conversationClearLoading, setConversationClearLoading] = useState(false);
+  const [sessionID, setSessionID] = useState("");
 
   const chatRef = useRef(null);
   const prevMessages = useRef([]);
@@ -87,26 +88,28 @@ function Homepage() {
 
   const clearResponsesAndTotalMessages = async () => {
     setConversationClearLoading(false);
-    await clearResponses();
-    messageResponseFunction();
     setTotalMessages([]);
     setJobDescription('');
     listOfAudio.forEach(audio => audio.pause());
     setConversationClearLoading(true);
   }
 
-  const submitJobDescription = () => {
+  const submitJobDescription = async () => {
     if (jobDescription.trim() === '') {
       // Show an alert or toast message indicating that the field is required
       setShowAlert(true);
       return; // Do not proceed with submission
     }
 
+    const sidResponse = await axios.post("http://localhost:8080/create_session", { uid: user.uid });
+    setSessionID(sidResponse.data.sid);
+
     axios.post('http://localhost:8080/set_job_description_for_user', {
-      text: jobDescription, uid: user.uid
-    }).then((response) => {
+      text: jobDescription, uid: user.uid, sid: sidResponse.data.sid
+    }).then(async (response) => {
       console.log(jobDescription);
       clearResponsesAndTotalMessages();
+      messageResponseFunction(sidResponse.data.sid);
       setIsSubmit(true);
     })
       .catch((error) => {
@@ -127,7 +130,7 @@ function Homepage() {
         formData.append("file", audioBlob, "audio.wav");
         axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' } })
           .then((response) => {
-            axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user" })
+            axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user", sid: sessionID})
             setMessages([...messages, { role: "User", content: response.data.text }])
           })
           .catch((error) => {
@@ -136,13 +139,13 @@ function Homepage() {
       });
   };
 
-  const messageResponseFunction = async () => {
-
+  const messageResponseFunction = async (sid = sessionID) => {
+    console.log("sid", sid);
     console.log("messages:", messages);
-    const response = await axios.post("http://localhost:8080/fetch_response", { uid: user.uid });
-    console.log(response.data)
-    await axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data, role: "assistant" })
+    const response = await axios.post("http://localhost:8080/fetch_response", { sid });
+    await axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data, role: "assistant", sid })
     setBotMessages([...botMessages, { role: "Celia", content: response.data }])
+  
   }
 
   function createBlobURL(data) {

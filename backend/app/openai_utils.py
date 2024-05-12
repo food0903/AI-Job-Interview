@@ -9,7 +9,7 @@ client = OpenAI(
 )
 
 
-def fetch_assistant_response(user_id: int):
+def fetch_assistant_response(sid: int):
     """
     Fetches the assistant response from the OpenAI GPT API based on the user ID which
     will be used to fetch the message history from the Firestore database.
@@ -21,8 +21,8 @@ def fetch_assistant_response(user_id: int):
     :return: str
     
     """
-    description = get_job_description(user_id)
-    return run_gpt_query(fetch_messages_from_db_for_gpt(user_id), description)
+    description = get_job_description(sid)
+    return run_gpt_query(fetch_messages_from_db_for_gpt(sid), description)
 
 def text_to_audio_response(text: str):
     """

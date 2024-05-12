@@ -6,12 +6,11 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.openai_utils import audio_to_text, add_message_to_db, fetch_assistant_response, text_to_audio_response
-from app.firebase_utils import clear_messages_for_user, set_job_description
+from app.firebase_utils import clear_messages_for_user, set_job_description, create_session_in_db
 import tempfile
 from pathlib import Path
 from pydantic import BaseModel
 import os
-
 
 # FastAPI instance
 app = FastAPI()
@@ -32,12 +31,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Classes for POST requests 
 class Message(BaseModel):
     role: str
     content: str
     uid: str
+    sid: str
 
 class User(BaseModel):
     uid: str
@@ -48,10 +47,19 @@ class Text(BaseModel):
 class JobDescription(BaseModel):
     uid: str
     text: str
+    sid: str
+
+class Session(BaseModel):
+    sid: str
+
+@app.post("/create_session")
+def create_session(user: User):
+    sid = create_session_in_db(user.uid)
+    return {"sid": sid}
 
 @app.post("/fetch_response")
-def fetch_response(user: User):
-    return fetch_assistant_response(user.uid)
+def fetch_response(session: Session):
+    return fetch_assistant_response(session.sid)
     
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
@@ -81,7 +89,7 @@ async def transcribe_text(file: UploadFile = File(...)):
 def add_message(message: Message):
 
     # adds the message to the firestore db
-    add_message_to_db(message.role, message.content, message.uid)
+    add_message_to_db(message.role, message.content, message.uid, message.sid)
 
     # return response
     return {"response": "Message added to the database."}
@@ -101,5 +109,5 @@ def text_to_speech(text: Text):
 
 @app.post("/set_job_description_for_user")
 def set_job_description_for_user(description: JobDescription):
-    set_job_description(description.uid, description.text)
-    return {"response": "Job description set for user."}
+    set_job_description(description.uid, description.text, description.sid)
+    return {"response": "Job description set for user session."}

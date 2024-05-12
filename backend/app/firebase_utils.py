@@ -9,7 +9,18 @@ firebase_admin.initialize_app(cred)
 # db object to access db 
 db = firestore.client()
 
-def add_message_to_db(role: str, content: str, uid: int):
+def create_session_in_db(uid: str): 
+    """
+    Initializes a chat session for a user in the Firestore database
+
+    :param uid: The user id of the user
+    :type uid: str
+    :return: return the session id
+    """
+    update_time, session_ref = db.collection("sessions").add({"uid": uid, "timestamp": datetime.now()})
+    return session_ref.id
+
+def add_message_to_db(role: str, content: str, uid: str, sid: str):
     """
     Adds a message to the Firestore database.
 
@@ -18,9 +29,9 @@ def add_message_to_db(role: str, content: str, uid: int):
     :type message: str
     """
     timestamp = datetime.now()
-    db.collection("messages").add({"role": role, "content": content, "uid": uid, "timestamp": timestamp})
+    db.collection("messages").add({"role": role, "content": content, "uid": uid, "timestamp": timestamp, "sid": sid})
 
-def fetch_messages_from_db_for_gpt(uid: str):
+def fetch_messages_from_db_for_gpt(sid: str):
     """
     Fetches messages from the Firestore database
 
@@ -30,9 +41,11 @@ def fetch_messages_from_db_for_gpt(uid: str):
     :return: list
     """
     messages = []
-    for message in db.collection("messages").where("uid", "==", uid).order_by("timestamp").stream():
-        message_dict = message.to_dict()
-        messages.append({'role': message_dict['role'], 'content': message_dict['content']})
+    message_query = db.collection("messages").where("sid", "==", sid).order_by("timestamp").stream()
+    for message in message_query:
+        messages.append(message.to_dict())
+    messages = [{'content': message['content'], 'role': message['role']} for message in messages]
+    print("NULL OR NOT", messages)
     return messages
 
 
@@ -49,19 +62,16 @@ def clear_messages_for_user(uid: str):
     for message in messages_for_user:
         message.reference.delete()
 
-def set_job_description(uid: str, job_description: str):
+def set_job_description(uid: str, job_description: str, sid: str):
     """
     Sets job description for user in the Firestore database
 
     :param uid: The user id of the user
     :type uid: int
     """
-    job_descriptions_ref = db.collection("job_descriptions")
-    job_descriptions_ref.document(uid).set({
-        'description': job_description
-    })
+    db.collection("sessions").document(sid).update({"job_description": job_description})
 
-def get_job_description(uid: str):
+def get_job_description(sid: str):
     """
     Gets job description for user in the Firestore database
 
@@ -70,17 +80,14 @@ def get_job_description(uid: str):
     :return: The job description for the user
     :return: str
     """
-    job_descriptions_ref = db.collection("job_descriptions")
-    document = job_descriptions_ref.document(uid).get()
+    document = db.collection("sessions").document(sid).get()
 
     if document.exists:
         job_description = document.to_dict()
-        return job_description.get('description')
+        return job_description.get('job_description')
     else:
         return None
-
-
-
+    
 
 
 #add_message_to_db("assistant", "What is your qualifications?", 1)
