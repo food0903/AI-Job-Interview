@@ -185,7 +185,7 @@ function Homepage() {
   }, [totalMessages]);
   return (
     <SidebarLayout>
-      <div className="w-full h-full mt-2 ml-2 flex items-center justify-center gap-x-4">
+      <div className="w-full h-full flex items-center justify-center gap-x-4 overflow-hidden">
         {!isSubmit &&
           <div className="w-2/5 h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
               <div className="flex flex-row justify-start gap-x-2 items-center">
@@ -221,9 +221,9 @@ function Homepage() {
 
           </div>
         }
-        {isSubmit &&
-          <div className="w-[900px] p-4 h-[800px] rounded-2xl drop-shadow-lg bg-slate-100 relative overflow-y-auto">
-            <div ref={chatRef} className="w-custom h-[650px] gap-4 flex flex-col overflow-y-auto no-scrollbar">
+        {isSubmit &&  
+          <div className="w-[80%] max-h-[100%] md: max-h-120 rounded-2xl drop-shadow-lg bg-slate-100 overflow-hidden">
+            <div ref={chatRef} className="w-[100%] md:h-[590px] gap-4 flex flex-col overflow-auto">
               {conversationClearLoading &&
                 <>
                   {
@@ -260,23 +260,23 @@ function Homepage() {
               }
 
             </div>
+              <div className="flex justify-center md:h-[13%] gap-x-4 items-end">
+                <Recorder handleStop={saveAudio} />
+                <button
+                  className="flex bg-white h-[4rem] w-[4rem] outline-none drop-shadow-md rounded-full items-center justify-center shadow-lg"
+                  onClick={() => { setIsSubmit(false); clearResponsesAndTotalMessages(); }}
+                >
+                  <ArrowBackIosNewIcon />
+                </button>
+              </div>
 
 
+        </div>
+       
 
-            <div className="flex justify-center h-[100px] gap-x-4 items-end">
-              <Recorder handleStop={saveAudio} />
-              <button
-                className="flex bg-white h-[4rem] w-[4rem] outline-none drop-shadow-md rounded-full items-center justify-center shadow-lg"
-                onClick={() => { setIsSubmit(false); clearResponsesAndTotalMessages(); }}
-              >
-                <ArrowBackIosNewIcon />
-              </button>
-            </div>
-
-
-          </div>
         }
         <div className="ml-30">
+          
 
 
         </div>
