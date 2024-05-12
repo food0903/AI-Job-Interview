@@ -185,7 +185,7 @@ function Homepage() {
   }, [totalMessages]);
   return (
     <SidebarLayout>
-      <div className="w-full h-full flex items-center justify-center gap-x-4 overflow-hidden">
+      <div className="w-full h-full flex relative items-center justify-center gap-x-4 overflow-hidden">
         {!isSubmit &&
           <div className="w-2/5 h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
               <div className="flex flex-row justify-start gap-x-2 items-center">
@@ -206,7 +206,7 @@ function Homepage() {
               onChange={(e) => setJobDescription(e.target.value)}
               multiline
               rows={20}
-              inputProps={{ style: { fontSize: "0.8rem", borderRadius: "20px" } }}
+              inputProps={{ style: { fontSize: "0.8rem"} }}
               
             />
 
@@ -222,8 +222,8 @@ function Homepage() {
           </div>
         }
         {isSubmit &&  
-          <div className="w-[80%] max-h-[100%] md: max-h-120 rounded-2xl drop-shadow-lg bg-slate-100 overflow-hidden">
-            <div ref={chatRef} className="w-[100%] md:h-[590px] gap-4 flex flex-col overflow-auto">
+          <div className="w-full h-full overflow-hidden">
+            <div ref={chatRef} className="w-[100%] h-[90%] p-2 gap-4 flex flex-col overflow-y-auto no-scrollbar">
               {conversationClearLoading &&
                 <>
                   {
@@ -231,7 +231,7 @@ function Homepage() {
                       <>
                         {message.role === "User" &&
                           <div className="flex flex-row justify-end gap-x-2 items-center">
-                            <div className="p-2 bg-slate-200  max-w-[600px]  drop-shadow-lg rounded-2xl">
+                            <div className="p-2 bg-slate-200 max-w-[600px] drop-shadow-lg rounded-2xl">
                               <Typography sx={{ fontFamily: "nunito" }}>
                                 {message.content}
                               </Typography>
@@ -260,10 +260,10 @@ function Homepage() {
               }
 
             </div>
-              <div className="flex justify-center md:h-[13%] gap-x-4 items-end">
+              <div className="flex justify-center h-[5.5rem] bg-[#FFFFFF] sticky bottom-0 gap-x-4 items-center">
                 <Recorder handleStop={saveAudio} />
                 <button
-                  className="flex bg-white h-[4rem] w-[4rem] outline-none drop-shadow-md rounded-full items-center justify-center shadow-lg"
+                  className="flex h-[4rem] w-[4rem] bg-white outline-none rounded-full items-center justify-center shadow-lg"
                   onClick={() => { setIsSubmit(false); clearResponsesAndTotalMessages(); }}
                 >
                   <ArrowBackIosNewIcon />
@@ -275,11 +275,7 @@ function Homepage() {
        
 
         }
-        <div className="ml-30">
-          
 
-
-        </div>
       </div>
     </SidebarLayout>
   );
