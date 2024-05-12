@@ -187,7 +187,7 @@ function Homepage() {
     <SidebarLayout>
       <div className="w-full h-full flex relative items-center justify-center gap-x-4 overflow-hidden">
         {!isSubmit &&
-          <div className="w-2/5 h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
+          <div className="w-[600px] h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
               <div className="flex flex-row justify-start gap-x-2 items-center">
                 <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
                 <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
@@ -231,7 +231,7 @@ function Homepage() {
                       <>
                         {message.role === "User" &&
                           <div className="flex flex-row justify-end gap-x-2 items-center">
-                            <div className="p-2 bg-slate-200 max-w-[600px] drop-shadow-lg rounded-2xl">
+                            <div className="p-2 bg-slate-200 max-w-[800px] drop-shadow-lg rounded-2xl">
                               <Typography sx={{ fontFamily: "nunito" }}>
                                 {message.content}
                               </Typography>
@@ -242,7 +242,7 @@ function Homepage() {
                         {message.role === "Celia" &&
                           <div className="flex flex-row justify-start gap-x-2 items-center">
                             <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
-                            <div className="p-2 bg-blue-500 max-w-[600px] drop-shadow-lg rounded-2xl">
+                            <div className="p-2 bg-blue-500 max-w-[800px] drop-shadow-lg rounded-2xl">
                               <Typography sx={{ color: "white", fontFamily: "nunito" }}>
                                 {message.content}
                               </Typography>
@@ -261,13 +261,14 @@ function Homepage() {
 
             </div>
               <div className="flex justify-center h-[5.5rem] bg-[#FFFFFF] sticky bottom-0 gap-x-4 items-center">
-                <Recorder handleStop={saveAudio} />
-                <button
-                  className="flex h-[4rem] w-[4rem] bg-white outline-none rounded-full items-center justify-center shadow-lg"
+              <button
+                  className="flex h-[4rem] w-[4rem] bg-white outline-none rounded-full items-center justify-center drop-shadow-md"
                   onClick={() => { setIsSubmit(false); clearResponsesAndTotalMessages(); }}
                 >
                   <ArrowBackIosNewIcon />
                 </button>
+                <Recorder handleStop={saveAudio} />
+                
               </div>
 
 
