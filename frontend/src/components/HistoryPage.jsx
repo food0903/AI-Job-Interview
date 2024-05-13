@@ -5,6 +5,7 @@ import HistoryMessageComponent from "./HistoryMessageComponent";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Avatar, Typography } from "@mui/material";
+import { motion } from "framer-motion";
 
 
 
@@ -13,6 +14,15 @@ export default function HistoryPage() {
     const [messageHistory, setMessageHistory] = useState([]);
     const [sessionID, setSessionID] = useState("");
     const [messageContents, setMessageContents] = useState([]);
+    const [messagesLoaded, setMessagesLoaded] = useState(false);
+
+        // Add a new state variable for the key
+    const [animationKey, setAnimationKey] = useState(0);
+
+    // Change the key when messagesLoaded changes
+    useEffect(() => {
+        setAnimationKey(prevKey => prevKey + 1);
+    }, [messagesLoaded]);
 
     const getAllSessions = () => {
         axios.post("http://localhost:8080/get_all_sessions", { uid: user.uid })
@@ -26,17 +36,19 @@ export default function HistoryPage() {
     }
 
     const getMessageBasedOnSessionID = () => {
+        setMessagesLoaded(false);
         if (sessionID) {
-
             axios.post("http://localhost:8080/get_all_messages_based_off_sid", { sid: sessionID })
                 .then((response) => {
                     setMessageContents(response.data);
                     console.log(response.data);
+                    setMessagesLoaded(true);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
         }
+       
     }
 
     useEffect(() => {
@@ -57,10 +69,15 @@ export default function HistoryPage() {
                     ))}
                 </div>
                 <div className="w-4/5 bg-white h-full rounded-r-xl drop-shadow-sm overflow-y-auto no-scrollbar p-2">
+                    {messagesLoaded && <>
                     {messageContents.map((message) => (
-                        <div className="p-2 gap-4 flex flex-col overflow-y-auto no-scrollbar">
+                        <div className="p-2 gap-4 flex flex-col no-scrollbar">
                             {message.role == "assistant" &&
-                                <div className="flex flex-row justify-start gap-x-2 items-center">
+                                <motion.div
+                                initial={{ x: '-10vw' }}
+                                animate={{ x: 0 }}
+                                transition={{ type: 'tween', duration: 0.25 }}
+                                 className="flex flex-row justify-start gap-x-2 items-center">
                                     <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
                                     <div className="p-2 bg-blue-500 max-w-[500px] drop-shadow-lg rounded-2xl">
                                         <Typography sx={{ color: "white", fontFamily: "nunito" }}>
@@ -68,22 +85,28 @@ export default function HistoryPage() {
                                         </Typography>
                                     </div>
 
-                                </div>
+                                </motion.div>
                             }
 
                             {message.role === "user" &&
-                                <div className="flex flex-row justify-end gap-x-2 items-center">
+                                <motion.div 
+                                    initial={{ x: '130vw' }}
+                                    animate={{ x: 0 }}
+                                    transition={{ type: 'tween', duration: 0.25 }}
+                                    className="flex flex-row justify-end gap-x-2 items-center">
                                     <div className="p-2 bg-slate-200 max-w-[500px] drop-shadow-lg rounded-2xl">
                                         <Typography sx={{ fontFamily: "nunito" }}>
                                             {message.content}
                                         </Typography>
                                     </div>
                                     <Avatar src={user?.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
-                                </div>
+                                </motion.div>
                             }
 
                         </div>
                     ))}
+                    </>
+                    }
 
 
 
