@@ -50,13 +50,13 @@ export default function HistoryPage() {
 
     return (
         <SidebarLayout selectedTab="History">
-            <div className="w-full h-full flex ">
-                <div className="w-1/5 bg-white overflow-x-hidden drop-shadow-sm rounded-s-xl h-full overflow-y-auto no-scrollbar">
+            <div className="w-full h-full flex justify-center ">
+                <div className="w-1/5 p-2 gap-2 bg-white overflow-x-hidden flex flex-col drop-shadow-sm border-r-2 rounded-s-xl h-full overflow-y-auto no-scrollbar">
                     {messageHistory && messageHistory.map((message) => (
-                        <HistoryMessageComponent sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} />
+                        <HistoryMessageComponent sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp}/>
                     ))}
                 </div>
-                <div className="w-4/5 bg-white h-full rounded-r-xl border drop-shadow-sm p-2">
+                <div className="w-4/5 bg-white h-full rounded-r-xl drop-shadow-sm overflow-y-auto no-scrollbar p-2">
                     {messageContents.map((message) => (
                         <div className="p-2 gap-4 flex flex-col overflow-y-auto no-scrollbar">
                             {message.role == "assistant" &&

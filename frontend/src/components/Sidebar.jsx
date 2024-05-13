@@ -26,7 +26,7 @@ function Sidebar({selectedTab}) {
       };
 
     return (
-        <div className="w-[260px] bg-slate-100 h-screen">
+        <div className="min-w-[260px] bg-slate-100 h-screen">
             <div className="h-1/2 w-full flex flex-col items-center p-2">
             {selectedTab === "Celia" ? ( 
                 <motion.div onClick={() => navigate("/")} whileHover={{ scale: 1.1 }} className="w-4/5 text-blue-600 mt-12 bg-white drop-shadow-xl rounded-2xl h-[50px] gap-x-2 items-center flex flex-row justify-center font-nunito hover:cursor-pointer">

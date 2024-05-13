@@ -190,7 +190,7 @@ function Homepage() {
             <TextField
               sx={{ width: "100%", mt: 2 }}
               id="response"
-              placeholder="Job Description"
+              placeholder="Input your job description here..."
               onChange={(e) => setJobDescription(e.target.value)}
               multiline
               rows={10}
@@ -199,7 +199,7 @@ function Homepage() {
             />
 
             <div className="w-full flex justify-center">
-              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2 }} variant="contained">Submit</Button>
+              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">Submit</Button>
             </div>
             {showAlert && (
               <Alert severity="error" sx={{ mt: 1 }}>
