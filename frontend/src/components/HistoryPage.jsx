@@ -90,9 +90,9 @@ export default function HistoryPage() {
 
                             {message.role === "user" &&
                                 <motion.div 
-                                    initial={{ x: '130vw' }}
+                                    initial={{ x: '110vw' }}
                                     animate={{ x: 0 }}
-                                    transition={{ type: 'tween', duration: 0.25 }}
+                                    transition={{ type: 'tween', duration: 0.50 }}
                                     className="flex flex-row justify-end gap-x-2 items-center">
                                     <div className="p-2 bg-slate-200 max-w-[500px] drop-shadow-lg rounded-2xl">
                                         <Typography sx={{ fontFamily: "nunito" }}>
