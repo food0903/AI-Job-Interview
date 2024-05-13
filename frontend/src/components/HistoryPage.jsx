@@ -63,7 +63,7 @@ export default function HistoryPage() {
     return (
         <SidebarLayout selectedTab="History">
             <div className="w-full h-full flex justify-center ">
-                <div className="w-1/5 p-2 gap-2 bg-white overflow-x-hidden flex flex-col drop-shadow-sm border-r-2 rounded-s-xl h-full overflow-y-auto no-scrollbar">
+                <div className="w-1/5 p-2 gap-2 bg-white overflow-x-hidden flex flex-col border-r-2 rounded-s-xl h-full overflow-y-auto no-scrollbar">
                     {messageHistory && messageHistory.map((message) => (
                         <HistoryMessageComponent sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp}/>
                     ))}
@@ -74,7 +74,7 @@ export default function HistoryPage() {
                         <div className="p-2 gap-4 flex flex-col no-scrollbar">
                             {message.role == "assistant" &&
                                 <motion.div
-                                initial={{ x: '-10vw' }}
+                                initial={{ x: '-20vw' }}
                                 animate={{ x: 0 }}
                                 transition={{ type: 'tween', duration: 0.25 }}
                                  className="flex flex-row justify-start gap-x-2 items-center">
@@ -90,9 +90,9 @@ export default function HistoryPage() {
 
                             {message.role === "user" &&
                                 <motion.div 
-                                    initial={{ x: '110vw' }}
+                                    initial={{ x: '70vw' }}
                                     animate={{ x: 0 }}
-                                    transition={{ type: 'tween', duration: 0.50 }}
+                                    transition={{ type: 'tween', duration: 0.25 }}
                                     className="flex flex-row justify-end gap-x-2 items-center">
                                     <div className="p-2 bg-slate-200 max-w-[500px] drop-shadow-lg rounded-2xl">
                                         <Typography sx={{ fontFamily: "nunito" }}>

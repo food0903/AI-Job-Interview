@@ -10,10 +10,10 @@ export default function HistoryMessageComponent({sid, setSidState, jobDescriptio
             onClick={() => setSidState(sid)} 
        
             
-            className="hover:cursor-pointer w-full h-24 bg-white rounded-xl border-1 drop-shadow-sm font-nunito p-2">
-            <span className="line-clamp-2 font-bold">{jobDescription}</span>
+            className="hover:cursor-pointer w-full h-24 bg-white rounded-xl border-1 drop-shadow-lg font-nunito p-2">
+            <span className="line-clamp-2 font-semibold">{jobDescription}</span>
             
-            <span>{day} {time}</span>
+            <span className="text-slate-600 text-sm">{day} {time}</span>
         </motion.div>
     );
 }
