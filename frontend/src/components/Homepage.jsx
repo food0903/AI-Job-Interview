@@ -76,7 +76,7 @@ function Homepage() {
 
 
   useEffect(() => {
-    messageResponseFunction();
+    if (sessionID) messageResponseFunction();
   }, [messages])
 
 
@@ -171,23 +171,8 @@ function Homepage() {
       });
   }
 
-  const clearResponses = async () => {
-    try {
-      const response = await axios.delete(`http://localhost:8080/delete_messages/${user.uid}`);
-      console.log(response.data.message);
-      // Optionally, you can update the state or perform other actions after clearing responses
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
-
-  useEffect(() => {
-    if (totalMessages.length === 0) {
-      clearResponses();
-    }
-  }, [totalMessages]);
   return (
-    <SidebarLayout>
+    <SidebarLayout selectedTab="Celia">
       <div className="w-full h-full flex relative items-center justify-center gap-x-4 overflow-hidden">
         {!isSubmit &&
           <div className="w-[600px] h-auto p-4 rounded-2xl drop-shadow-lg bg-slate-100 items-center flex flex-col relative overflow-y-auto no-scrollbar">
@@ -208,7 +193,7 @@ function Homepage() {
               placeholder="Job Description"
               onChange={(e) => setJobDescription(e.target.value)}
               multiline
-              rows={20}
+              rows={10}
               inputProps={{ style: { fontSize: "0.8rem"} }}
               
             />

@@ -45,7 +45,6 @@ def fetch_messages_from_db_for_gpt(sid: str):
     for message in message_query:
         messages.append(message.to_dict())
     messages = [{'content': message['content'], 'role': message['role']} for message in messages]
-    print("NULL OR NOT", messages)
     return messages
 
 
@@ -85,6 +84,24 @@ def get_job_description(sid: str):
     if document.exists:
         job_description = document.to_dict()
         return job_description.get('job_description')
+    else:
+        return None
+
+def get_all_sessions_from_db(uid: str):
+    """
+    Gets all job sessions
+
+    :param uid: The user id of the user
+    :type uid: int
+    :return: Array of job sessions
+    :return: arr
+    """
+    documents = db.collection("sessions").where("uid", "==", uid).stream()
+
+    documents = [{**doc.to_dict(), 'sid': doc.id} for doc in documents]
+
+    if documents:
+        return documents
     else:
         return None
     
