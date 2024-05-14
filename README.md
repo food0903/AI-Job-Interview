@@ -24,7 +24,7 @@ Facing the hardships of the job market in 2024, four software engineering studen
 * **React and Vite:** Together, they run our frontend and everything you see.
 * **OpenAI's GPT-4, Transcriptions API, and Whisper API**: They, together, give Celia a personality and voice.
 * **Firebase:** Helps Celia remember the previous conversations.
-* **Docker:** Well, we dockerized Celia, so it can run on any OS or system (basically).
+* **Docker:** Well, we dockerized Celia, so she can run on any OS or system (basically).
 
 ## 🏆 Awards
 * **SiliconXHacks 2024**: Most Impactful Project for Students
