@@ -139,6 +139,8 @@ function Homepage() {
       });
   };
 
+  
+
   const messageResponseFunction = async (sid = sessionID) => {
     console.log("sid", sid);
     console.log("messages:", messages);
@@ -170,7 +172,7 @@ function Homepage() {
         console.error("Error:", error);
       });
   }
-
+  
   return (
     <SidebarLayout selectedTab="Celia">
       <div className="w-full h-full flex relative items-center justify-center gap-x-4 overflow-hidden">

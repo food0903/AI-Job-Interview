@@ -4,9 +4,9 @@ import { auth } from "../firebase";
 import HistoryMessageComponent from "./HistoryMessageComponent";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Avatar, Typography } from "@mui/material";
+import { Avatar, Typography, Button } from "@mui/material";
 import { motion } from "framer-motion";
-
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 export default function HistoryPage() {
@@ -16,13 +16,17 @@ export default function HistoryPage() {
     const [messageContents, setMessageContents] = useState([]);
     const [messagesLoaded, setMessagesLoaded] = useState(false);
 
-        // Add a new state variable for the key
-    const [animationKey, setAnimationKey] = useState(0);
-
-    // Change the key when messagesLoaded changes
-    useEffect(() => {
-        setAnimationKey(prevKey => prevKey + 1);
-    }, [messagesLoaded]);
+    const clearResponses = async () => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/delete_sessions/${user.uid}`);
+            setSessionID("");
+            setMessageContents([]);
+            setMessageHistory([]);
+            console.log(response.data.message);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
 
     const getAllSessions = () => {
         axios.post("http://localhost:8080/get_all_sessions", { uid: user.uid })
@@ -63,12 +67,21 @@ export default function HistoryPage() {
     return (
         <SidebarLayout selectedTab="History">
             <div className="w-full h-full flex justify-center ">
-                <div className="w-1/5 p-2 gap-2 bg-white overflow-x-hidden flex flex-col border-r-2 rounded-s-xl h-full overflow-y-auto no-scrollbar">
-                    {messageHistory && messageHistory.map((message) => (
-                        <HistoryMessageComponent sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp}/>
-                    ))}
+                <div className="w-1/5 overflow-x-hidden flex flex-col border-r-2">
+                    <div className="w-full p-2 gap-2 bg-white overflow-x-hidden flex flex-col  rounded-s-xl h-full overflow-y-auto no-scrollbar">
+                        {messageHistory && messageHistory.map((message) => (
+                            <HistoryMessageComponent sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp}/>
+                        ))}
+                    </div>
+                    <div className="block mx-auto mt-2">
+                        <Button onClick={clearResponses} startIcon={<DeleteIcon/>} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>Delete All</Button>
+                    </div>
+                </div>
+                <div>
+                    
                 </div>
                 <div className="w-4/5 bg-white h-full rounded-r-xl drop-shadow-sm overflow-y-auto no-scrollbar p-2">
+                    <div className="w-full h-full overflow-hidden">
                     {messagesLoaded && <>
                     {messageContents.map((message) => (
                         <div className="p-2 gap-4 flex flex-col no-scrollbar">
@@ -109,7 +122,7 @@ export default function HistoryPage() {
                     }
 
 
-
+                    </div>
 
 
 

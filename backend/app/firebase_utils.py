@@ -48,7 +48,7 @@ def fetch_messages_from_db_for_gpt(sid: str):
     return messages
 
 
-def clear_messages_for_user(uid: str):
+def clear_messages_and_sessions_for_user(uid: str):
     """
     Deletes all messages for a specific user from the Firestore database
 
@@ -60,6 +60,14 @@ def clear_messages_for_user(uid: str):
 
     for message in messages_for_user:
         message.reference.delete()
+    
+    sessions_ref = db.collection("sessions")
+    sessions_for_user = sessions_ref.where("uid", "==", uid).stream()
+
+    for sessions in sessions_for_user:
+        sessions.reference.delete()
+
+
 
 def set_job_description(uid: str, job_description: str, sid: str):
     """
