@@ -5,10 +5,10 @@
 </p>
 
 ## Who are you, Celia?
-Hi, I'm **Celia**, and I am powered by OpenAI's **GPT-4** model. I allow users to copy and paste any job description that they could find (or a rough summary of what they need to interview for, perhaps), after which I initiate a job interview with questions tailored to the job description. The conversation continues with follow-up questions and responses based on the user's interactions with me,  allowing me to creating an **interactive** and **real-time** interview experience.
+Hi, I'm **Celia**, and I am powered by OpenAI's **GPT-4** model. I allow users to copy and paste any job description that they could find (or a rough summary of what they need to interview for, perhaps), after which I initiate a job interview with questions tailored to the job description. The conversation continues with follow-up questions and responses based on the user's interactions with me, allowing me to creating an **interactive** and **real-time** interview experience.
 
 ## Why was I created?
-Facing the hardships of the job market in 2024, four software engineering students at SJSU decided to create **Celia**. They realized that there were many technical job interview platforms; however, there is a lack of behavioral job interview platform. After this realization, at SiliconXHacks 2024, the four SE students decided to create Celia, an AI that simulates a behavioral job interview and interacts with the user in real-time.
+Facing the hardships of the job market in 2024, four software engineering students at SJSU decided to create **Celia**. They realized that there were many technical job interview platforms; however, there is a lack of behavioral job interview platform. After this realization, at SiliconXHacks 2024, the four SE students decided to create Celia, an AI that simulates a behavioral job interview and interacts with the user in real-time. In addition, I was also created at a hackathon, isn't that cool?
 
 ## Well, what can you do?
 * **AI-Powered Interview:** Celia AI uses GPT-4 to mimic the job interview process.
