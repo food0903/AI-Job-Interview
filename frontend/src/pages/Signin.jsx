@@ -21,9 +21,9 @@ const SignInPage = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <div className="text-center mb-4">
-          <img src="CompanyLogo.png" alt="Logo" className="mx-auto" />
-          <h2 className="text-2xl font-bold">Sign In</h2>
-          <p className="text-gray-500">Remember everything important.</p>
+          <img src="CompanyLogo.png" alt="Logo" className="mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold font-nunito">Celia AI</h2>
+          <p className="text-gray-500 font-nunito">Your personal job interview assistant.</p>
         </div>
         <div className="flex flex-col items-center">
           {!user && !loading ? (
