@@ -104,7 +104,7 @@ function Homepage() {
     const sidResponse = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/create_session`, { uid: user.uid });
     setSessionID(sidResponse.data.sid);
 
-    axios.post(`${import.meta.env.PUBLIC_API_URL}/set_job_description_for_user`, {
+    axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/set_job_description_for_user`, {
       text: jobDescription, uid: user.uid, sid: sidResponse.data.sid
     }).then(async (response) => {
       console.log(jobDescription);
