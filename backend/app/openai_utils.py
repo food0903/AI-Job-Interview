@@ -1,7 +1,7 @@
 from openai import OpenAI
 import os
 import random
-from app.firebase_utils import add_message_to_db, fetch_messages_from_db_for_gpt, get_job_description
+from app.firebase_utils import add_message_to_db, fetch_messages_from_db_for_gpt, add_feedback_to_db, get_job_description
 
 # OpenAI instance
 client = OpenAI(
@@ -79,6 +79,45 @@ def run_gpt_query(message_history: list, job_description_text: str = "Music indu
         messages=messages,
         model="gpt-3.5-turbo")
     return chat_completion.choices[0].message.content
+
+def generate_feedback(sid: str):
+    """
+    Generates feedback for the user based on the conversation history in the Firestore database.
+
+    :param sid: The session ID of the user
+    :type sid: str
+    :return: The feedback generated for the user
+    :return: str
+    """
+    conversation_history_string = ""
+    messages = fetch_messages_from_db_for_gpt(sid)
+    for message in messages:
+        if message["role"] == "assistant":
+            conversation_history_string += "Interviewer: " + message["content"] + "\n"
+        else:
+            conversation_history_string += "Candidate: " + message["content"] + "\n"
+    
+    message_log_for_gpt = [
+        {
+            "role": "system",
+            "content": (f'You are given a transcript of an interview that has occurred. This could be for any job,'
+            f'but the job description is not given. You are to provide feedback on the interview that has occurred.'    
+            f'Do not repeat or quote anything that the user has said. Provide feedback on the interview that has occurred.'
+            f'Keep your words minimum 150 words and maximum 250 words. Do not prefix your feedback with anything such as'
+            f'Feedback: or something along the lines. Simply just provide feedback.')
+        },
+        {
+            "role": "user",
+            "content": conversation_history_string
+        }
+    ]
+    chat_completion = client.chat.completions.create(
+        messages=message_log_for_gpt,
+        model="gpt-3.5-turbo")
+    add_feedback_to_db(sid, chat_completion.choices[0].message.content)
+    return chat_completion.choices[0].message.content
+    
+
 
 def response_behavior(job_description_text: str = "") -> list:
     """

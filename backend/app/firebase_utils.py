@@ -47,7 +47,6 @@ def fetch_messages_from_db_for_gpt(sid: str):
     messages = [{'content': message['content'], 'role': message['role']} for message in messages]
     return messages
 
-
 def clear_messages_and_sessions_for_user(uid: str):
     """
     Deletes all messages for a specific user from the Firestore database
@@ -94,6 +93,23 @@ def get_job_description(sid: str):
         return job_description.get('job_description')
     else:
         return None
+    
+def get_feedback_in_db(sid: str):
+    """
+    Gets feedback from the Firestore database
+
+    :param sid: The session ID
+    :type uid: str
+    :return: The feedback from the bot
+    :return: str
+    """
+    document = db.collection("feedback").document(sid).get()
+
+    if document.exists:
+        feedback = document.to_dict()
+        return feedback.get('feedback')
+    else:
+        return None
 
 def get_all_sessions_from_db(uid: str):
     """
@@ -112,7 +128,15 @@ def get_all_sessions_from_db(uid: str):
         return documents
     else:
         return None
-    
+
+def add_feedback_to_db(sid: str, feedback: str):
+    """
+    Adds feedback to the Firestore database
+
+    :param feedback: The feedback to be added to the database
+    :type feedback: str
+    """
+    db.collection("feedback").document(sid).set({"feedback": feedback}, merge=True)
 
 
 #add_message_to_db("assistant", "What is your qualifications?", 1)

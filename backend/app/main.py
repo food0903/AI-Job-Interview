@@ -5,8 +5,8 @@ from typing import Union
 from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.openai_utils import audio_to_text, add_message_to_db, fetch_assistant_response, text_to_audio_response
-from app.firebase_utils import clear_messages_and_sessions_for_user, set_job_description, create_session_in_db, get_all_sessions_from_db, fetch_messages_from_db_for_gpt
+from app.openai_utils import audio_to_text, add_message_to_db, fetch_assistant_response, text_to_audio_response, generate_feedback
+from app.firebase_utils import clear_messages_and_sessions_for_user, set_job_description, create_session_in_db, get_all_sessions_from_db, fetch_messages_from_db_for_gpt, get_feedback_in_db
 import tempfile
 from pathlib import Path
 from pydantic import BaseModel
@@ -107,10 +107,22 @@ def text_to_speech(text: Text):
         yield response.content
     return StreamingResponse(iterfile(), media_type="application/octet-stream")
 
+@app.post("/get_feedback_in_db_from_session")
+def get_feedback_in_db_from_session(session: Session):
+    feedback_in_db = get_feedback_in_db(session.sid)
+    if feedback_in_db is None:
+        return ""
+    else:
+        return feedback_in_db
+
 @app.post("/set_job_description_for_user")
 def set_job_description_for_user(description: JobDescription):
     set_job_description(description.uid, description.text, description.sid)
     return {"response": "Job description set for user session."}
+
+@app.post("/get_feedback_from_session")
+def get_feedback_from_session(session: Session):
+    return generate_feedback(session.sid)
 
 @app.post("/get_all_sessions")
 def get_all_sessions(user: User):
