@@ -140,7 +140,7 @@ export default function HistoryPage() {
                                 <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
                                 <div className="p-2 bg-blue-500 max-w-[500px] drop-shadow-lg rounded-2xl">
                                    { !feedback ?
-                                    <Button onClick={generateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
+                                    <Button disabled={loadingFeedback} onClick={generateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
                                     :
                                     <div>
                                         <Typography sx={{ color: "white", fontFamily: "nunito" }}>
