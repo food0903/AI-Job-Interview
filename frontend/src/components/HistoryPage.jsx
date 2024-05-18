@@ -19,7 +19,7 @@ export default function HistoryPage() {
 
     const clearResponses = async () => {
         try {
-            const response = await axios.delete(`http://localhost:8080/delete_sessions/${user.uid}`);
+            const response = await axios.delete(`${import.meta.env.VITE_PUBLIC_API_URL}/delete_sessions/${user.uid}`);
             setSessionID("");
             setMessageContents([]);
             setMessageHistory([]);
@@ -32,7 +32,7 @@ export default function HistoryPage() {
     const generateFeedback = async () => {
         try {
             setLoadingFeedback(true);
-            const response = await axios.post("http://localhost:8080/get_feedback_from_session", { sid: sessionID });
+            const response = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_feedback_from_session`, { sid: sessionID });
             setFeedback(response.data);
             setLoadingFeedback(false);
         } catch (error) {
@@ -42,7 +42,7 @@ export default function HistoryPage() {
 
 
     const getAllSessions = () => {
-        axios.post("http://localhost:8080/get_all_sessions", { uid: user.uid })
+        axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_all_sessions`, { uid: user.uid })
             .then((response) => {
                 setMessageHistory(response.data);
                 console.log(response.data);
@@ -55,10 +55,10 @@ export default function HistoryPage() {
     const getMessageBasedOnSessionID = () => {
         setMessagesLoaded(false);
         if (sessionID) {
-            axios.post("http://localhost:8080/get_all_messages_based_off_sid", { sid: sessionID })
+            axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_all_messages_based_off_sid`, { sid: sessionID })
                 .then(async (response) => {
                     setMessagesLoaded(false);
-                    const responseDB = await axios.post("http://localhost:8080/get_feedback_in_db_from_session", { sid: sessionID });
+                    const responseDB = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_feedback_in_db_from_session`, { sid: sessionID });
                     setFeedback(responseDB.data);
                     setMessageContents(response.data);
                     console.log(response.data);

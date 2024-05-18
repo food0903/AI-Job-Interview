@@ -101,10 +101,10 @@ function Homepage() {
       return; // Do not proceed with submission
     }
 
-    const sidResponse = await axios.post("http://localhost:8080/create_session", { uid: user.uid });
+    const sidResponse = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/create_session`, { uid: user.uid });
     setSessionID(sidResponse.data.sid);
 
-    axios.post('http://localhost:8080/set_job_description_for_user', {
+    axios.post(`${import.meta.env.PUBLIC_API_URL}/set_job_description_for_user`, {
       text: jobDescription, uid: user.uid, sid: sidResponse.data.sid
     }).then(async (response) => {
       console.log(jobDescription);
@@ -128,9 +128,9 @@ function Homepage() {
       .then(async (audioBlob) => {
         const formData = new FormData();
         formData.append("file", audioBlob, "audio.wav");
-        axios.post("http://localhost:8080/transcribe_text/", formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/transcribe_text/`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
           .then((response) => {
-            axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data.text, role: "user", sid: sessionID})
+            axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/add_message`, { uid: user.uid, content: response.data.text, role: "user", sid: sessionID})
             setMessages([...messages, { role: "User", content: response.data.text }])
           })
           .catch((error) => {
@@ -144,8 +144,8 @@ function Homepage() {
   const messageResponseFunction = async (sid = sessionID) => {
     console.log("sid", sid);
     console.log("messages:", messages);
-    const response = await axios.post("http://localhost:8080/fetch_response", { sid });
-    await axios.post("http://localhost:8080/add_message", { uid: user.uid, content: response.data, role: "assistant", sid })
+    const response = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/fetch_response`, { sid });
+    await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/add_message`, { uid: user.uid, content: response.data, role: "assistant", sid })
     setBotMessages([...botMessages, { role: "Celia", content: response.data }])
   
   }
@@ -157,7 +157,7 @@ function Homepage() {
   }
 
   const receiveMessageAudioOutput = async (text) => {
-    await axios.post("http://localhost:8080/text_to_speech", { text }, { responseType: 'arraybuffer' })
+    await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/text_to_speech`, { text }, { responseType: 'arraybuffer' })
       .then((response) => {
         const blob = response.data;
         const audio = new Audio();
