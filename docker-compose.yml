@@ -1,0 +1,34 @@
+services:
+  backend-dev:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: flotoria/backend:dev
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend/app:/code/app
+  backend-prod:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    image: flotoria/backend:prod
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend/.env
+  frontend-dev:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: flotoria/frontend:dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/code
+
+# Run dev environment for the backend: docker-compose up backend-dev --build
+# Run prod environment for the backend: docker-compose up backend-prod --build
+# Frontend dockerization does not work at the moment so just cd to frontend and npm run dev

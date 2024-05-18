@@ -104,7 +104,9 @@ def generate_feedback(sid: str):
             f'but the job description is not given. You are to provide feedback on the interview that has occurred.'    
             f'Do not repeat or quote anything that the user has said. Provide feedback on the interview that has occurred.'
             f'Keep your words minimum 150 words and maximum 250 words. Do not prefix your feedback with anything such as'
-            f'Feedback: or something along the lines. Simply just provide feedback.')
+            f'Feedback: or something along the lines. Simply just provide feedback. Use "I" when you refer to the interviewer'
+            f'and "you" for the candidate because you are the one who interviewed the person and are actively giving feedback.'
+            f'Do not give feedback about the interviewer itself.')
         },
         {
             "role": "user",

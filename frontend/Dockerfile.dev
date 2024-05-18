@@ -1,0 +1,11 @@
+FROM node:latest AS builder
+
+WORKDIR /code
+
+COPY ./ /code
+
+RUN npm i
+
+RUN npm install @rollup/rollup-linux-x64-gnu --save-optional
+
+CMD ["npm", "run", "dev"]

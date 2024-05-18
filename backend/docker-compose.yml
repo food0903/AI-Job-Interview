@@ -1,8 +1,0 @@
-services:
-  backend:
-    build: . 
-    image: flotoria/backend:latest
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
