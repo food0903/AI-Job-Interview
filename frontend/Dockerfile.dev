@@ -8,4 +8,4 @@ RUN npm i
 
 RUN npm install @rollup/rollup-linux-x64-gnu --save-optional
 
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "--host"]
