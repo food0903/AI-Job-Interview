@@ -20,6 +20,7 @@ function Sidebar({selectedTab}) {
     const handleSignOut = async () => {
         try {
           await signOut(auth);
+          navigate("/");
         } catch (error) {
           console.error(error.message);
         }
