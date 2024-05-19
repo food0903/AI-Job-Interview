@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Avatar, Typography, Button, CircularProgress, Box } from "@mui/material";
 import { motion } from "framer-motion";
 import DeleteIcon from '@mui/icons-material/Delete';
+import ShowJobDescriptionModal from "./ShowJobDescriptionModal";
 
 export default function HistoryPage() {
     const [user] = useAuthState(auth);
@@ -14,8 +15,10 @@ export default function HistoryPage() {
     const [sessionID, setSessionID] = useState("");
     const [messageContents, setMessageContents] = useState([]);
     const [messagesLoaded, setMessagesLoaded] = useState(false);
-    const [feedback, setFeedback] = useState("");
+    const [feedback, setFeedback] = useState({});
     const [loadingFeedback, setLoadingFeedback] = useState(false);
+    const [jobDescription, setJobDescription] = useState("");
+    const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
 
     const clearResponses = async () => {
         try {
@@ -33,7 +36,7 @@ export default function HistoryPage() {
         try {
             setLoadingFeedback(true);
             const response = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_feedback_from_session`, { sid: sessionID });
-            setFeedback(response.data);
+            setFeedback({...feedback, [sessionID]: response.data});
             setLoadingFeedback(false);
         } catch (error) {
             console.error("Error:", error);
@@ -55,12 +58,12 @@ export default function HistoryPage() {
     const getMessageBasedOnSessionID = () => {
         setMessagesLoaded(false);
         if (sessionID) {
-            axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_all_messages_based_off_sid`, { sid: sessionID })
+            axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_sid_details`, { sid: sessionID })
                 .then(async (response) => {
                     setMessagesLoaded(false);
-                    const responseDB = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_feedback_in_db_from_session`, { sid: sessionID });
-                    setFeedback(responseDB.data);
-                    setMessageContents(response.data);
+                    setFeedback({...feedback, [sessionID]: response.data.feedback});
+                    setMessageContents(response.data.messages);
+                    setJobDescription(response.data.job_description);
                     console.log(response.data);
                     setMessagesLoaded(true);
                 })
@@ -82,6 +85,7 @@ export default function HistoryPage() {
 
     return (
         <SidebarLayout selectedTab="History">
+            <ShowJobDescriptionModal jobDescription={jobDescription} open={showJobDescriptionModal} handleClose={() => setShowJobDescriptionModal(false)} />
             <div className="w-full h-full flex justify-center ">
                 <div className="w-1/5 overflow-x-hidden flex flex-col border-r-2">
                     <div className="w-full p-2 gap-2 bg-white overflow-x-hidden flex flex-col rounded-s-xl h-full overflow-y-auto no-scrollbar">
@@ -95,7 +99,18 @@ export default function HistoryPage() {
                 </div>
                 <div className="w-4/5 bg-white h-full flex rounded-r-xl drop-shadow-sm overflow-y-auto no-scrollbar p-2">
                     <div className="w-full p-3 h-full overflow-y-auto drop-shadow-md">
+
                         {messagesLoaded && <>
+                            <motion.div
+                                initial={{ x: '70vw' }}
+                                animate={{ x: 0 }}
+                                transition={{ type: 'tween', duration: 0.25 }}
+                                className="flex flex-row p-2 justify-end gap-x-2 items-center">
+                                <div className="p-2 bg-slate-200 max-w-[500px] drop-shadow-lg rounded-2xl">
+                                <Button fullWidth onClick={() => setShowJobDescriptionModal(true)} sx={{ color: "black", borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#e6e6e6", '&:hover': { backgroundColor: '#bfbdbd' } }} variant="contained">View job description</Button> 
+                                </div>
+                                <Avatar src={user?.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
+                            </motion.div>
                             {messageContents.map((message) => (
                                 <div className="p-2 gap-4 flex flex-col no-scrollbar">
                                     {message.role == "assistant" &&
@@ -139,17 +154,17 @@ export default function HistoryPage() {
                                 className="flex p-2 flex-row justify-start gap-x-2 items-center">
                                 <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
                                 <div className="p-2 bg-blue-500 max-w-[500px] drop-shadow-lg rounded-2xl">
-                                   { !feedback ?
-                                    <Button disabled={loadingFeedback} onClick={generateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
-                                    :
-                                    <div>
-                                        <Typography sx={{ color: "white", fontFamily: "nunito" }}>
-                                            <b>Feedback:</b> {feedback}
+                                    {!feedback[sessionID] ?
+                                        <Button disabled={loadingFeedback} onClick={generateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
+                                        :
+                                        <div>
+                                            <Typography sx={{ color: "white", fontFamily: "nunito" }}>
+                                                <b>Feedback:</b> {feedback[sessionID]}
 
-                                        </Typography>
-                                        <Button fullWidth disabled={loadingFeedback} onClick={generateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Regenerate feedback</Button>
-                                    </div>
-                                    
+                                            </Typography>
+                                            <Button fullWidth disabled={loadingFeedback} onClick={generateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Regenerate feedback</Button>
+                                        </div>
+
                                     }
                                 </div>
 

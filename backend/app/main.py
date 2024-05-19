@@ -6,7 +6,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.openai_utils import audio_to_text, add_message_to_db, fetch_assistant_response, text_to_audio_response, generate_feedback
-from app.firebase_utils import clear_messages_and_sessions_for_user, set_job_description, create_session_in_db, get_all_sessions_from_db, fetch_messages_from_db_for_gpt, get_feedback_in_db
+from app.firebase_utils import clear_messages_and_sessions_for_user, set_job_description, create_session_in_db, get_all_sessions_from_db, fetch_messages_from_db_for_gpt, get_feedback_in_db, get_job_description
 import tempfile
 from pathlib import Path
 from pydantic import BaseModel
@@ -120,6 +120,7 @@ def get_feedback_from_session(session: Session):
 def get_all_sessions(user: User):
     return get_all_sessions_from_db(user.uid)
 
-@app.post("/get_all_messages_based_off_sid")
-def get_all_messages_based_off_sid(session: Session):
-    return fetch_messages_from_db_for_gpt(session.sid)
+@app.post("/get_sid_details")
+def get_sid_details(session: Session):
+    return { "job_description": get_job_description(session.sid), "messages": fetch_messages_from_db_for_gpt(session.sid), "feedback": get_feedback_in_db(session.sid) }
+
