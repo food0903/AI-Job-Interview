@@ -128,7 +128,7 @@ function Homepage() {
       .then(async (audioBlob) => {
         const formData = new FormData();
         formData.append("file", audioBlob, "audio.wav");
-        axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/transcribe_text/`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/transcribe_text`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
           .then((response) => {
             axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/add_message`, { uid: user.uid, content: response.data.text, role: "user", sid: sessionID})
             setMessages([...messages, { role: "User", content: response.data.text }])

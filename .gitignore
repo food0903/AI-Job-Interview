@@ -5,3 +5,5 @@ env/
 venv
 firebase.json
 dist
+# Local Netlify folder
+.netlify
