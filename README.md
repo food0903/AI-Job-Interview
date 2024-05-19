@@ -29,10 +29,9 @@ Facing the hardships of the job market in 2024, four software engineering studen
 ## 🏆 Awards
 * **SiliconXHacks 2024**: Most Impactful Project for Students
 
-
-
-## 📹 Video Demo
-Coming soon.
+## 📹  Demo
+* **Video Demo:** Coming soon. <br>
+* **Website Demo (until our backend shuts down):** [Link](https://celiaai.netlify.app/)
 
 ## 🧑 Creators and Developers of Celia
 * **Hasnain Mucklai**: [GitHub](https://github.com/Hasnain7861) [LinkedIn](https://www.linkedin.com/in/hasnainmucklai/)
