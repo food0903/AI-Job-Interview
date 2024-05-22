@@ -1,6 +1,6 @@
 import React from 'react';
 import SignInPage from './Signin'; // Correct capitalization
-import Homepage from '../components/Homepage'; // Correct capitalization
+import Homepage from '../modules/Home/components/Homepage'; // Correct capitalization
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../firebase'; // Ensure this is the correct import
 

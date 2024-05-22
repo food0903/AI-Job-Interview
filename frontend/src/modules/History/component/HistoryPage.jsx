@@ -1,6 +1,6 @@
-import SidebarLayout from "../components/SidebarLayout";
+import SidebarLayout from "../../Common/component/SidebarLayout";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
+import { auth } from "../../../firebase";
 import HistoryMessageComponent from "./HistoryMessageComponent";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -90,7 +90,7 @@ export default function HistoryPage() {
                 <div className="w-1/5 overflow-x-hidden flex flex-col border-r-2">
                     <div className="w-full p-2 gap-2 bg-white overflow-x-hidden flex flex-col rounded-s-xl h-full overflow-y-auto no-scrollbar">
                         {messageHistory && messageHistory.map((message) => (
-                            <HistoryMessageComponent sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp} />
+                            <HistoryMessageComponent key = {message.sid} sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp} />
                         ))}
                     </div>
                     <div className="block mx-auto mt-2">
