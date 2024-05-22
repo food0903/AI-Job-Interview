@@ -9,6 +9,11 @@ import { motion } from "framer-motion";
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShowJobDescriptionModal from "./ShowJobDescriptionModal";
 
+import { useClearResponses } from "../hooks/useClearResponses"; 
+import { useGenerateFeedback } from "../hooks/useGenerateFeedback"; 
+import { useGetAllSessions } from "../hooks/useGetAllSessions"; 
+import { useGetMessageBasedOnSessionID } from "../hooks/useGetMessageBasedOnSessionID";
+
 export default function HistoryPage() {
     const [user] = useAuthState(auth);
     const [messageHistory, setMessageHistory] = useState([]);
@@ -16,71 +21,65 @@ export default function HistoryPage() {
     const [messageContents, setMessageContents] = useState([]);
     const [messagesLoaded, setMessagesLoaded] = useState(false);
     const [feedback, setFeedback] = useState({});
-    const [loadingFeedback, setLoadingFeedback] = useState(false);
     const [jobDescription, setJobDescription] = useState("");
     const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
 
-    const clearResponses = async () => {
+    const { clearResponses } = useClearResponses(); // Using custom hook
+    const { generateFeedback, loading: loadingFeedback } = useGenerateFeedback(); // Using custom hook
+    const { getAllSessions } = useGetAllSessions(); // Using custom hook
+    const { getMessageBasedOnSessionID } = useGetMessageBasedOnSessionID(); // Using custom hook
+
+    const handleClearResponses = async () => {
         try {
-            const response = await axios.delete(`${import.meta.env.VITE_PUBLIC_API_URL}/delete_sessions/${user.uid}`);
+            const response = await clearResponses(user.uid); // Using custom hook function
             setSessionID("");
             setMessageContents([]);
             setMessageHistory([]);
-            console.log(response.data.message);
         } catch (error) {
             console.error("Error:", error);
         }
     }
 
-    const generateFeedback = async () => {
+    const handleGenerateFeedback = async () => {
         try {
-            setLoadingFeedback(true);
-            const response = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_feedback_from_session`, { sid: sessionID });
-            setFeedback({...feedback, [sessionID]: response.data});
-            setLoadingFeedback(false);
+            const feedbackData = await generateFeedback(sessionID); // Using custom hook function
+            setFeedback({...feedback, [sessionID]: feedbackData});
         } catch (error) {
             console.error("Error:", error);
         }
     }
 
 
-    const getAllSessions = () => {
-        axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_all_sessions`, { uid: user.uid })
-            .then((response) => {
-                setMessageHistory(response.data);
-                console.log(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+    const handleGetAllSessions = async () => {
+        try {
+            const sessions = await getAllSessions(user.uid); // Using custom hook function
+            setMessageHistory(sessions);
+        } catch (error) {
+            console.error("Error:", error);
+        }
     }
 
-    const getMessageBasedOnSessionID = () => {
+    const handleGetMessageBasedOnSessionID = async () => {
         setMessagesLoaded(false);
-        if (sessionID) {
-            axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/get_sid_details`, { sid: sessionID })
-                .then(async (response) => {
-                    setMessagesLoaded(false);
-                    setFeedback({...feedback, [sessionID]: response.data.feedback});
-                    setMessageContents(response.data.messages);
-                    setJobDescription(response.data.job_description);
-                    console.log(response.data);
-                    setMessagesLoaded(true);
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+        try {
+            const sessionDetails = await getMessageBasedOnSessionID(sessionID);
+            setFeedback({...feedback, [sessionID]: sessionDetails.feedback});
+            setMessageContents(sessionDetails.messages);
+            setJobDescription(sessionDetails.job_description);
+            setMessagesLoaded(true);
+        } catch (error) {
+            console.error("Error:", error);
         }
 
     }
 
     useEffect(() => {
         console.log(sessionID);
-        getMessageBasedOnSessionID();
+        handleGetMessageBasedOnSessionID();
     }, [sessionID])
 
     useEffect(() => {
-        if (user) getAllSessions();
+        if (user) handleGetAllSessions();
     }, [user?.uid]);
 
     return (
@@ -94,7 +93,7 @@ export default function HistoryPage() {
                         ))}
                     </div>
                     <div className="block mx-auto mt-2">
-                        <Button onClick={clearResponses} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>Delete All</Button>
+                        <Button onClick={handleClearResponses} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>Delete All</Button>
                     </div>
                 </div>
                 <div className="w-4/5 bg-white h-full flex rounded-r-xl drop-shadow-sm overflow-y-auto no-scrollbar p-2">
@@ -111,8 +110,8 @@ export default function HistoryPage() {
                                 </div>
                                 <Avatar src={user?.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
                             </motion.div>
-                            {messageContents.map((message) => (
-                                <div className="p-2 gap-4 flex flex-col no-scrollbar">
+                            {messageContents.map((message, index) => (
+                                <div key = {index} className="p-2 gap-4 flex flex-col no-scrollbar">
                                     {message.role == "assistant" &&
                                         <motion.div
                                             initial={{ x: '-20vw' }}
@@ -155,14 +154,14 @@ export default function HistoryPage() {
                                 <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
                                 <div className="p-2 bg-blue-500 max-w-[500px] drop-shadow-lg rounded-2xl">
                                     {!feedback[sessionID] ?
-                                        <Button disabled={loadingFeedback} onClick={generateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
+                                        <Button disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
                                         :
                                         <div>
                                             <Typography sx={{ color: "white", fontFamily: "nunito" }}>
                                                 <b>Feedback:</b> {feedback[sessionID]}
 
                                             </Typography>
-                                            <Button fullWidth disabled={loadingFeedback} onClick={generateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Regenerate feedback</Button>
+                                            <Button fullWidth disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Regenerate feedback</Button>
                                         </div>
 
                                     }

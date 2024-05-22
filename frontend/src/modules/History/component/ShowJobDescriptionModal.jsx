@@ -1,5 +1,6 @@
 import { Modal, Typography, Box, IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import React from "react";
 
 export default function ShowJobDescriptionModal({ jobDescription, open, handleClose }) {
     return (<Modal
@@ -12,11 +13,11 @@ export default function ShowJobDescriptionModal({ jobDescription, open, handleCl
             <IconButton size="sm"  onClick={handleClose} sx={{ borderRadius: "20px", color: "black", marginLeft: "auto" }}><CloseIcon /></IconButton>
             </Box>
             <Typography className="font-nunito" id="modal-modal-title" variant="body" component="h2">
-                {jobDescription.trimStart().split('\n').map((line) => (
-                    <>
+                {jobDescription.trimStart().split('\n').map((line, index) => (
+                    <React.Fragment key = {index}>
                         {line}
                         <br />
-                    </>))}
+                    </React.Fragment>))}
             </Typography>
         </Box>
     </Modal>)
