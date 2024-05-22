@@ -1,5 +1,5 @@
 import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../firebase";
+import { auth } from "../../../firebase";
 import Avatar from '@mui/material/Avatar';
 import { motion } from "framer-motion";
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 function Sidebar({selectedTab}) {
     const [user] = useAuthState(auth);
-    const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null); // Added state for managing anchorEl
     const navigate = useNavigate();
 
     const handleSignOut = async () => {
@@ -24,7 +24,15 @@ function Sidebar({selectedTab}) {
         } catch (error) {
           console.error(error.message);
         }
-      };
+    };
+
+    const handleMenuClick = (event) => {
+        setAnchorEl(event.currentTarget); // Set anchorEl to the current target (button that was clicked)
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null); // Set anchorEl to null to close the menu
+    };
 
     return (
         <div className="min-w-[260px] bg-slate-100 h-screen">
@@ -60,8 +68,9 @@ function Sidebar({selectedTab}) {
                   
                     <Menu
                         id="basic-menu"
-                        open={open}
-                        onClose={() => setOpen(false)}
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleMenuClose} 
                         MenuListProps={{
                             'aria-labelledby': 'basic-button',
                         }}
@@ -71,7 +80,7 @@ function Sidebar({selectedTab}) {
                         <MenuItem sx={{fontFamily: "nunito"}} onClick={handleSignOut}>Logout</MenuItem>
                     </Menu>
           
-                    <motion.div onClick={() => setOpen(true)} whileHover={{ scale: 1.03 }} className="w-full h-full bg-[#FFFFFF] hover:bg-slate-50 transition duration-100 ease-in-out drop-shadow-md rounded-2xl hover:cursor-pointer">
+                    <motion.div onClick={handleMenuClick} whileHover={{ scale: 1.03 }} className="w-full h-full bg-[#FFFFFF] hover:bg-slate-50 transition duration-100 ease-in-out drop-shadow-md rounded-2xl hover:cursor-pointer">
                         <div className="flex h-full w-full gap-x-2 items-center p-1 max-w-full">
                             <Avatar src={user?.photoURL} sx={{ bgcolor: "purple" }}></Avatar>
                             <div className="flex flex-col flex-grow max-w-full">

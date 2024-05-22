@@ -8,7 +8,7 @@ function Recorder({ handleStop}) {
     return (
     <ReactMediaRecorder
         audio
-        onStop={handleStop}
+        onStop={(blobUrl, blob) => handleStop(blob)} // Ensure blob is passed correctly
         render={({ status, startRecording, stopRecording }) => (
         <div>
             <button

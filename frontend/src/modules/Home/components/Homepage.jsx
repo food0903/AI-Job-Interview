@@ -9,36 +9,43 @@ import {
   Avatar
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
-import { ReactMediaRecorder } from "react-media-recorder";
+import { auth } from "../../../firebase";
 import Recorder from "./Recorder";
 import axios from "axios";
 import { useAuthState } from "react-firebase-hooks/auth";
-import Sidebar from "./Sidebar";
-import SidebarLayout from "./SidebarLayout";
+import SidebarLayout from "../../Common/component/SidebarLayout";
 import { motion } from "framer-motion"
+import { useCreateSession } from "../../Common/hooks/useCreateSession";
+import { useSetJobDescription } from "../../Home/hooks/useSetJobDescription";
+import { useAddMessage } from "../../Home/hooks/useAddMessage";
+import { useFetchResponse } from "../../Home/hooks/useFetchResponse";
+import { useTranscribeText } from "../../Home/hooks/useTranscribeText";
+import { useTextToSpeech } from "../../Home/hooks/useTextToSpeech";
 function Homepage() {
-  const [currentMessage, setCurrentMessage] = useState('');
-  const [audioBlob, setAudioBlob] = useState(null);
   const [messages, setMessages] = useState([]);
   const [botMessages, setBotMessages] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
-  const [response, setResponse] = useState(null);
   const [user] = useAuthState(auth);
   const [showAlert, setShowAlert] = useState(false);
   const [totalMessages, setTotalMessages] = useState([]);
   const [isSubmit, setIsSubmit] = useState(false);
   const [listOfAudio, setListOfAudio] = useState([]);
   const [conversationClearLoading, setConversationClearLoading] = useState(false);
-  const [sessionID, setSessionID] = useState("");
+  const [sessionID, setSessionID] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Added state for isLoading
+
 
   const chatRef = useRef(null);
   const prevMessages = useRef([]);
   const prevBotMessages = useRef([]);
+
+  // Use custom hooks
+  const { createSession } = useCreateSession(user?.uid);
+  const { setJobDescriptionForUser } = useSetJobDescription();
+  const { addMessage } = useAddMessage();
+  const { fetchResponse } = useFetchResponse();
+  const { transcribeText } = useTranscribeText();
+  const { textToSpeech } = useTextToSpeech();
 
 
   useEffect(() => {
@@ -101,53 +108,43 @@ function Homepage() {
       return; // Do not proceed with submission
     }
 
-    const sidResponse = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/create_session`, { uid: user.uid });
-    setSessionID(sidResponse.data.sid);
-
-    axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/set_job_description_for_user`, {
-      text: jobDescription, uid: user.uid, sid: sidResponse.data.sid
-    }).then(async (response) => {
-      console.log(jobDescription);
+    try {
+      const sid = await createSession(); // Changed to use createSession hook
+      setSessionID(sid);
+      await setJobDescriptionForUser(jobDescription, user.uid, sid); // Changed to use setJobDescriptionForUser hook
       clearResponsesAndTotalMessages();
-      messageResponseFunction(sidResponse.data.sid);
+      messageResponseFunction(sid);
       setIsSubmit(true);
-    })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
   }
-  const saveAudio = (audioBlob) => {
+  const saveAudio = async (audioBlob) => {
     setIsLoading(true);
     listOfAudio.forEach(audio => audio.pause());
     const myMessage = { sender: "me", audioBlob };
     const messageList = [...messages, myMessage];
 
-    console.log(audioBlob);
-    fetch(audioBlob)
-      .then((res) => res.blob())
-      .then(async (audioBlob) => {
-        const formData = new FormData();
-        formData.append("file", audioBlob, "audio.wav");
-        axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/transcribe_text`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-          .then((response) => {
-            axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/add_message`, { uid: user.uid, content: response.data.text, role: "user", sid: sessionID})
-            setMessages([...messages, { role: "User", content: response.data.text }])
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
-      });
+    try {
+      const transcribedText = await transcribeText(audioBlob); // Changed to use transcribeText hook
+      await addMessage(user.uid, transcribedText, "user", sessionID); // Changed to use addMessage hook
+      setMessages([...messages, { role: "User", content: transcribedText }]);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   
 
   const messageResponseFunction = async (sid = sessionID) => {
-    console.log("sid", sid);
-    console.log("messages:", messages);
-    const response = await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/fetch_response`, { sid });
-    await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/add_message`, { uid: user.uid, content: response.data, role: "assistant", sid })
-    setBotMessages([...botMessages, { role: "Celia", content: response.data }])
-  
+    try {
+      const response = await fetchResponse(sid); // Changed to use fetchResponse hook
+      await addMessage(user.uid, response, "assistant", sid); // Changed to use addMessage hook
+      setBotMessages([...botMessages, { role: "Celia", content: response }]);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
 
   function createBlobURL(data) {
@@ -157,20 +154,16 @@ function Homepage() {
   }
 
   const receiveMessageAudioOutput = async (text) => {
-    await axios.post(`${import.meta.env.VITE_PUBLIC_API_URL}/text_to_speech`, { text }, { responseType: 'arraybuffer' })
-      .then((response) => {
-        const blob = response.data;
-        const audio = new Audio();
-        audio.src = createBlobURL(blob);
-        setIsLoading(false);
-        console.log("audio ", audio);
-        isSubmit && audio.play();
-
-        setListOfAudio([...listOfAudio, audio]);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    try {
+      const audioData = await textToSpeech(text); // Changed to use textToSpeech hook
+      const audio = new Audio();
+      audio.src = createBlobURL(audioData);
+      setIsLoading(false);
+      isSubmit && audio.play();
+      setListOfAudio([...listOfAudio, audio]);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
   
   return (
@@ -217,8 +210,8 @@ function Homepage() {
               {conversationClearLoading &&
                 <>
                   {
-                    totalMessages.map((message) => (
-                      <>
+                    totalMessages.map((message, index) => (
+                      <React.Fragment key = {index}>
                         {message.role === "User" &&
                           <motion.div 
                           initial={{ x: '80vw' }}
@@ -251,7 +244,7 @@ function Homepage() {
 
 
 
-                      </>
+                      </React.Fragment>
                     ))
                   }
                 </>
