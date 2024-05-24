@@ -25,14 +25,14 @@ export default function HistoryPage() {
     const [jobDescription, setJobDescription] = useState("");
     const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
 
-    const { clearResponses } = useClearResponses(); // Using custom hook
-    const { generateFeedback, loading: loadingFeedback } = useGenerateFeedback(); // Using custom hook
-    const { getAllSessions } = useGetAllSessions(); // Using custom hook
-    const { getMessageBasedOnSessionID } = useGetMessageBasedOnSessionID(); // Using custom hook
+    const { clearResponses, loading: loadingDelete } = useClearResponses(); 
+    const { generateFeedback, loading: loadingFeedback } = useGenerateFeedback(); 
+    const { getAllSessions } = useGetAllSessions(); 
+    const { getMessageBasedOnSessionID } = useGetMessageBasedOnSessionID(); 
 
     const handleClearResponses = async () => {
         try {
-            const response = await clearResponses(user.uid); // Using custom hook function
+            const response = await clearResponses(user.uid); 
             setSessionID("");
             setMessageContents([]);
             setMessageHistory([]);
@@ -47,7 +47,7 @@ export default function HistoryPage() {
             setFeedback({...feedback, [sessionID]: feedbackData});
         } catch (error) {
             console.error("Error:", error);
-        }
+        } 
     }
 
 
@@ -94,7 +94,9 @@ export default function HistoryPage() {
                         ))}
                     </div>
                     <div className="block mx-auto mt-2">
-                        <Button onClick={handleClearResponses} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>Delete All</Button>
+                        <Button onClick={handleClearResponses} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>
+                            {loadingDelete ? <CircularProgress size ={24} sx={{color: 'white'}}/> : 'Delete All'}
+                        </Button>
                     </div>
                 </div>
                 <div className="w-4/5 bg-white h-full flex rounded-r-xl drop-shadow-sm overflow-y-auto no-scrollbar p-2">
@@ -124,14 +126,18 @@ export default function HistoryPage() {
                                 <Avatar src="/Celia.jpg" sx={{ bgcolor: "purple" }}></Avatar>
                                 <div className="p-2 bg-blue-500 max-w-[500px] drop-shadow-lg rounded-2xl">
                                     {!feedback[sessionID] ?
-                                        <Button disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Generate feedback</Button>
+                                        <Button disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">
+                                            {loadingFeedback ? <CircularProgress size={24} sx={{color:'white'}} /> : 'Generate feedback'}
+                                        </Button>
                                         :
                                         <div>
                                             <Typography sx={{ color: "white", fontFamily: "nunito" }}>
                                                 <b>Feedback:</b> {feedback[sessionID]}
 
                                             </Typography>
-                                            <Button fullWidth disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">Regenerate feedback</Button>
+                                            <Button disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">
+                                                {loadingFeedback ? <CircularProgress size={24} sx={{color:'white'}} /> : 'Generate feedback'}
+                                            </Button>
                                         </div>
 
                                     }

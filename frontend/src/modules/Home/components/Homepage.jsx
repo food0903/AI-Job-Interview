@@ -14,6 +14,7 @@ import Recorder from "./Recorder";
 import axios from "axios";
 import { useAuthState } from "react-firebase-hooks/auth";
 import SidebarLayout from "../../Common/component/SidebarLayout";
+import { CircularProgress} from "@mui/material";
 import { motion } from "framer-motion"
 import { useCreateSession } from "../../Common/hooks/useCreateSession";
 import { useSetJobDescription } from "../../Home/hooks/useSetJobDescription";
@@ -42,7 +43,7 @@ function Homepage() {
 
   // Use custom hooks
   const { createSession } = useCreateSession(user?.uid);
-  const { setJobDescriptionForUser } = useSetJobDescription();
+  const { setJobDescriptionForUser, loading: setJobLoading } = useSetJobDescription();
   const { addMessage } = useAddMessage();
   const { fetchResponse } = useFetchResponse();
   const { transcribeText } = useTranscribeText();
@@ -194,7 +195,9 @@ function Homepage() {
             />
 
             <div className="w-full flex justify-center">
-              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">Submit</Button>
+              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">
+                { setJobLoading ? <CircularProgress size={24} sx={{color:'white'}} />:'Submit'}
+              </Button>
             </div>
             {showAlert && (
               <Alert severity="error" sx={{ mt: 1 }}>

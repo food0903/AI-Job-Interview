@@ -16,6 +16,8 @@ export const useGenerateFeedback = () => {
             setError(error);
             setLoading(false);
             throw error;
+        } finally{
+            setLoading(false);
         }
     };
 

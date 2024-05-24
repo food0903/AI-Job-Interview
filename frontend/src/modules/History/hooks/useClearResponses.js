@@ -14,8 +14,9 @@ export const useClearResponses = () => {
             return response.data;
         } catch (error) {
             setError(error);
-            setLoading(false);
             throw error;
+        } finally {
+            setLoading(false);  
         }
     };
 
