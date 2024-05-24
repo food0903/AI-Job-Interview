@@ -25,6 +25,7 @@ Facing the hardships of the job market in 2024, four software engineering studen
 * **OpenAI's GPT-4, Transcriptions API, and Whisper API**: They, together, give Celia a personality and voice.
 * **Firebase:** Helps Celia remember the previous conversations.
 * **Docker:** Well, we dockerized Celia, so she can run on any OS or system (basically).
+* **Google Cloud Run & Netlify:** The backend is deployed to Google Cloud Run while the frontend is deployed to Netlify.
 
 ## 🏆 Awards
 * **SiliconXHacks 2024**: Most Impactful Project for Students
