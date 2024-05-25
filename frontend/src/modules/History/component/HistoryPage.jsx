@@ -149,8 +149,8 @@ export default function HistoryPage() {
                                             </Typography>
                                             <Button fullWidth disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">
                                                 {loadingFeedback ? <CircularProgress size={24} sx={{color:'white'}} /> : <>
-                                                Generate Feedback</>    }
-                                                
+                                                Generate Feedback</> }
+                                                    
                                             </Button>
                                         </div>
 
