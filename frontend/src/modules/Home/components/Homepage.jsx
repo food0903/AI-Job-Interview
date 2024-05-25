@@ -35,6 +35,7 @@ function Homepage() {
   const [conversationClearLoading, setConversationClearLoading] = useState(false);
   const [sessionID, setSessionID] = useState('');
   const [isLoading, setIsLoading] = useState(false); // Added state for isLoading
+  const [jobLoading, setJobLoading] = useState(false);
 
 
   const chatRef = useRef(null);
@@ -43,7 +44,7 @@ function Homepage() {
 
   // Use custom hooks
   const { createSession } = useCreateSession(user?.uid);
-  const { setJobDescriptionForUser, loading: setJobLoading } = useSetJobDescription();
+  const { setJobDescriptionForUser} = useSetJobDescription();
   const { addMessage } = useAddMessage();
   const { fetchResponse } = useFetchResponse();
   const { transcribeText } = useTranscribeText();
@@ -110,12 +111,14 @@ function Homepage() {
     }
 
     try {
+      setJobLoading(true);
       const sid = await createSession(); // Changed to use createSession hook
       setSessionID(sid);
       await setJobDescriptionForUser(jobDescription, user.uid, sid); // Changed to use setJobDescriptionForUser hook
       clearResponsesAndTotalMessages();
       messageResponseFunction(sid);
       setIsSubmit(true);
+      setJobLoading(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -195,8 +198,8 @@ function Homepage() {
             />
 
             <div className="w-full flex justify-center">
-              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">
-                { setJobLoading ? <CircularProgress size={24} sx={{color:'white'}} />:'Submit'}
+              <Button onClick={submitJobDescription} disabled={jobLoading} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">
+                { jobLoading ? <CircularProgress size={24} sx={{color:'white'}} />:'Submit'}
               </Button>
             </div>
             {showAlert && (
