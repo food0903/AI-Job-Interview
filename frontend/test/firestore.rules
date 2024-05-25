@@ -1,0 +1,36 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Rules for the feedback collection
+    match /feedback/{feedbackId} {
+      // Allow only the user who created the feedback to read it
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+      // Allow only the user who created the feedback to create it (but not update it)
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+      allow update: if false;
+    }
+
+    // Rules for the sessions collection
+    match /sessions/{sessionId} {
+      // Allow authenticated users to read their own sessions
+      allow read: if request.auth != null && request.auth.uid == resource.data.uid;
+
+      // Allow only the user who created the session to write (create, update, delete)
+      allow create, update, delete: if request.auth != null && request.auth.uid == request.resource.data.uid;
+    }
+
+    // Rules for the messages collection
+    match /messages/{messageId} {
+      // Allow authenticated users to read messages
+      allow read: if request.auth != null;
+
+      // Deny users from updating their own messages
+      allow update: if false;
+
+      // Allow only the user who created the message to create and delete it
+      allow create, delete: if request.auth != null && request.auth.uid == request.resource.data.uid;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import axios from "axios";
 
 export const useCreateSession = (uid) => {
   const [sessionID, setSessionID] = useState(null);
+  const [isloading, setIsLoading] = useState(false);
 
   const createSession = async () => {
     try {
@@ -15,5 +16,5 @@ export const useCreateSession = (uid) => {
     }
   };
 
-  return { sessionID, createSession };
+  return { sessionID, createSession, isloading};
 };
