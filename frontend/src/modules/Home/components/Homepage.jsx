@@ -195,7 +195,7 @@ function Homepage() {
             />
 
             <div className="w-full flex justify-center">
-              <Button onClick={submitJobDescription} disabled={isSubmit} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">
+              <Button onClick={submitJobDescription} disabled={setJobLoading} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">
                 { setJobLoading ? <CircularProgress size={24} sx={{color:'white'}} />:'Submit'}
               </Button>
             </div>

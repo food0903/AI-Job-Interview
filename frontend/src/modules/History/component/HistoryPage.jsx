@@ -94,7 +94,7 @@ export default function HistoryPage() {
                         ))}
                     </div>
                     <div className="block mx-auto mt-2">
-                        <Button onClick={handleClearResponses} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>
+                        <Button onClick={handleClearResponses} disable={loadingDelete} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>
                             {loadingDelete ? <CircularProgress size ={24} sx={{color: 'white'}}/> : 'Delete All'}
                         </Button>
                     </div>
