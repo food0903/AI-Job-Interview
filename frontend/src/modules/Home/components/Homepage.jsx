@@ -122,6 +122,9 @@ function Homepage() {
     } catch (error) {
       console.error("Error:", error);
     }
+    finally {
+      setJobLoading(false);
+    }
 
   }
   const saveAudio = async (audioBlob) => {
