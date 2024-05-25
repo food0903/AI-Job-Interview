@@ -3,6 +3,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "../../../firebase";
 import HistoryMessageComponent from "./HistoryMessageComponent";
 import axios from "axios";
+import React from "react";
 import { useEffect, useState } from "react";
 import { Avatar, Typography, Button, CircularProgress, Box } from "@mui/material";
 import { motion } from "framer-motion";
@@ -24,6 +25,7 @@ export default function HistoryPage() {
     const [feedback, setFeedback] = useState({});
     const [jobDescription, setJobDescription] = useState("");
     const [showJobDescriptionModal, setShowJobDescriptionModal] = useState(false);
+    const [sessionsLoaded, setSessionsLoaded] = useState(false);
 
     const { clearResponses, loading: loadingDelete } = useClearResponses(); 
     const { generateFeedback, loading: loadingFeedback } = useGenerateFeedback(); 
@@ -53,8 +55,10 @@ export default function HistoryPage() {
 
     const handleGetAllSessions = async () => {
         try {
+            setSessionsLoaded(false);
             const sessions = await getAllSessions(user.uid); // Using custom hook function
             setMessageHistory(sessions);
+            setSessionsLoaded(true);
         } catch (error) {
             console.error("Error:", error);
         }
@@ -88,11 +92,20 @@ export default function HistoryPage() {
             <ShowJobDescriptionModal jobDescription={jobDescription} open={showJobDescriptionModal} handleClose={() => setShowJobDescriptionModal(false)} />
             <div className="w-full h-full flex justify-center ">
                 <div className="w-1/5 overflow-x-hidden flex flex-col border-r-2">
+                {sessionsLoaded ? 
                     <div className="w-full p-2 gap-2 bg-white overflow-x-hidden flex flex-col rounded-s-xl h-full overflow-y-auto no-scrollbar">
+                      
+                 
                         {messageHistory && messageHistory.map((message) => (
                             <HistoryMessageComponent key = {message.sid} sid={message.sid} setSidState={setSessionID} jobDescription={message.job_description} timestamp={message.timestamp} />
                         ))}
-                    </div>
+                        
+                    </div> 
+                     : <div className="justify-center flex w-full h-full items-center">
+                     <CircularProgress size={96} />
+                    </div> 
+                 }
+
                     <div className="block mx-auto mt-2">
                         <Button onClick={handleClearResponses} startIcon={<DeleteIcon />} variant="contained" sx={{ backgroundColor: "#d32f2f", color: "white", fontFamily: "nunito", '&:hover': { backgroundColor: '#e95858' } }}>
                             {loadingDelete ? <CircularProgress size ={24} sx={{color: 'white'}}/> : 'Delete All'}
@@ -133,10 +146,11 @@ export default function HistoryPage() {
                                         <div>
                                             <Typography sx={{ color: "white", fontFamily: "nunito" }}>
                                                 <b>Feedback:</b> {feedback[sessionID]}
-
                                             </Typography>
-                                            <Button disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">
-                                                {loadingFeedback ? <CircularProgress size={24} sx={{color:'white'}} /> : 'Generate feedback'}
+                                            <Button fullWidth disabled={loadingFeedback} onClick={handleGenerateFeedback} sx={{ mt: 1, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "#3565f2" }} variant="contained">
+                                                {loadingFeedback ? <CircularProgress size={24} sx={{color:'white'}} /> : <>
+                                                Generate Feedback</>    }
+                                                
                                             </Button>
                                         </div>
 
