@@ -42,7 +42,7 @@ function Homepage() {
   const prevBotMessages = useRef([]);
 
   // Use custom hooks
-  const { createSession } = useCreateSession(user?.uid);
+  const { createSession, isloading: isLoadingSession} = useCreateSession(user?.uid);
   const { setJobDescriptionForUser, loading: setJobLoading } = useSetJobDescription();
   const { addMessage } = useAddMessage();
   const { fetchResponse } = useFetchResponse();
@@ -196,7 +196,7 @@ function Homepage() {
 
             <div className="w-full flex justify-center">
               <Button onClick={submitJobDescription} disabled={setJobLoading} sx={{ mt: 2, borderRadius: "10px", fontFamily: "nunito", backgroundColor: "rgb(59 130 246)" }} variant="contained">
-                { setJobLoading ? <CircularProgress size={24} sx={{color:'white'}} />:'Submit'}
+                { (setJobLoading || isLoadingSession) ? <CircularProgress size={24} sx={{color:'white'}} />:'Submit'}
               </Button>
             </div>
             {showAlert && (
